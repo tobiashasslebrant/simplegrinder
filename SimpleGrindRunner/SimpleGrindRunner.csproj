@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentHelper.cs" />
-    <Compile Include="Cons.cs" />
+    <Compile Include="GridConsole.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

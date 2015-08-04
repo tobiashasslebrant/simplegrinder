@@ -14,7 +14,7 @@ namespace SimpleGrind.Loadtest
 			_action = action;
 		}
 
-		public LoadResult Run(int numberOfCalls, Action<LoadResult> callback, int wait)
+		public LoadResult Run(int numberOfCalls, int wait, Action<LoadResult> callback)
 		{
 			var tasks = new Task[numberOfCalls];
 			var result = new LoadResult();

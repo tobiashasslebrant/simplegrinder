@@ -2,30 +2,30 @@
 
 namespace SimpleGrindRunner
 {
-	public class Cons
+	public class GridConsole
 	{
 		private static string _console = "";
 		
-		public static void Write(string s)
+		public static void WriteCell(string cell)
 		{
 			Console.Clear();
-			var msg = s.PadRight(12);
-			_console += msg;
+			var paddedCell = cell.PadRight(12);
+			_console += paddedCell;
 			Console.Write(_console);
 		}
-		public static void WriteLine(string[] arr)
+		public static void WriteLine(string[] cells)
 		{
-			foreach (var s in arr)
-				Write(s);
+			foreach (var s in cells)
+				WriteCell(s);
 			_console += "\r\n";
 			Console.WriteLine();
 		}
 
-		public static void WriteBufferLine(string[] arr)
+		public static void WriteNoPersistantLine(string[] cells)
 		{
 			Console.Clear();
 			Console.Write(_console);
-			foreach (var s in arr)
+			foreach (var s in cells)
 				Console.Write(s.PadRight(12));
 			Console.WriteLine();
 		}

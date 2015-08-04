@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using SimpleGrind.Loadtest;
 
 namespace SimpleGrindRunner
@@ -10,20 +9,24 @@ namespace SimpleGrindRunner
 		{
 			var stopWatch = new Stopwatch();
 
-			Cons.WriteLine(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotalTime", "AvgTime" });
+			GridConsole.WriteLine(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotalTime", "AvgTime" });
 			var numberOfCalls = increaseBy == 0 ? 1 : 0;
 			for (var run = 1; run <= numberOfRuns; run++)
 			{
 				numberOfCalls += increaseBy;
 
-				Cons.Write(run.ToString());
-				Cons.Write(numberOfCalls.ToString());
+				GridConsole.WriteCell(run.ToString());
+				GridConsole.WriteCell(numberOfCalls.ToString());
 				stopWatch.Start();
 
-				var callback = new Action<LoadResult>(r => Cons.WriteBufferLine(new[] { r.Ok.ToString(), r.Failed.ToString() }));
-				var result = loadTest.Run(numberOfCalls,callback, wait);
+				var result = loadTest.Run(numberOfCalls, wait, r => GridConsole.WriteNoPersistantLine(new[]
+				{
+					r.Ok.ToString(), 
+					r.Failed.ToString()
+				}));
+				
 				var totalSec = (int)stopWatch.ElapsedMilliseconds / 1000;
-				Cons.WriteLine(new[]
+				GridConsole.WriteLine(new[]
 				{
 					result.Ok.ToString(),
 					result.Failed.ToString(),

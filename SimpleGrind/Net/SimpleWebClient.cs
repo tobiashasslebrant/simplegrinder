@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,15 +11,26 @@ namespace SimpleGrind.Net
 	{
 		readonly HttpClient _httpClient;
 
-		public SimpleWebClient(int timeOut)
+		public SimpleWebClient(int timeOut, Dictionary<string, string> defaultRequestHeaders, Dictionary<string, string> cookies)
 		{
+
+			var cookieContainer = new CookieContainer();
+			if(cookies != null)
+				foreach (var cookie in cookies)
+					cookieContainer.Add(new Cookie(cookie.Key,cookie.Value));
+				
 			_httpClient = new HttpClient(new HttpClientHandler
 			{
-				AllowAutoRedirect = false
+				AllowAutoRedirect = false,
+				CookieContainer = cookieContainer
 			})
 			{
-				Timeout = TimeSpan.FromSeconds(timeOut),
+				Timeout = TimeSpan.FromSeconds(timeOut)
 			};
+
+			if(defaultRequestHeaders != null)
+				foreach (var defaultRequestHeader in defaultRequestHeaders)
+					_httpClient.DefaultRequestHeaders.Add(defaultRequestHeader.Key,defaultRequestHeader.Value);
 		}
 
 		public async Task<HttpResponseMessage> GetAsync(string url)

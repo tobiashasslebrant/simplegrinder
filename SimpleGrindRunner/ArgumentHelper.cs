@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleGrindRunner
 {
 	class ArgumentHelper
 	{
-		string[] _args;
+		readonly string[] _args;
 		public ArgumentHelper(string[] args)
 		{
 			_args = args;
@@ -16,6 +12,7 @@ namespace SimpleGrindRunner
 
 		public T GetArg<T>(string parameter, T @default)
 		{
+			parameter = "/" + parameter;
 			for(var index = 0; index < _args.Length; index++)
 			{
 				if(index % 2 == 0)
