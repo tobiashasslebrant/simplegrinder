@@ -7,18 +7,6 @@ using SimpleGrind.Net;
 
 namespace SimpleGrindRunner
 {
-
-	//var client = new SimpleWebClient("http://localhost:9001/");
-	//var json = 
-	//	"{" +
-	//	"userid:\"6BC7FD57-6843-448D-98D0-5A0BE32B5FBA\", " +
-	//	"pno:\"\", " +
-	//	"productno:\"243170\", " +
-	//	"quantitytoadd:1" +
-	//	"}";
-	//var test = new ParallellLoadTest(() => client.PostJson("baskets/addproduct", json));
-
-	
 	public class Program
 	{
 		static void Help()
