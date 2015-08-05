@@ -9,7 +9,7 @@ namespace SimpleGrindRunner
 		{
 			var stopWatch = new Stopwatch();
 
-			GridConsole.WriteLine(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotalTime", "AvgTime" });
+			GridConsole.WriteCells(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotalTime", "AvgTime" });
 			var numberOfCalls = increaseBy == 0 ? 1 : 0;
 			for (var run = 1; run <= numberOfRuns; run++)
 			{
@@ -19,14 +19,14 @@ namespace SimpleGrindRunner
 				GridConsole.WriteCell(numberOfCalls.ToString());
 				stopWatch.Start();
 
-				var result = loadTest.Run(numberOfCalls, wait, r => GridConsole.WriteNoPersistantLine(new[]
+				var result = loadTest.Run(numberOfCalls, wait, r => GridConsole.WriteNoPersistantCells(new[]
 				{
 					r.Ok.ToString(), 
 					r.Failed.ToString()
 				}));
 				
 				var totalSec = (int)stopWatch.ElapsedMilliseconds / 1000;
-				GridConsole.WriteLine(new[]
+				GridConsole.WriteCells(new[]
 				{
 					result.Ok.ToString(),
 					result.Failed.ToString(),

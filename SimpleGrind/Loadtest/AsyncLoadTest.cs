@@ -39,7 +39,7 @@ namespace SimpleGrind.Loadtest
 					System.Threading.Thread.Sleep(wait);
 			}
 
-			Task.WaitAll(tasks);
+			Task.WhenAll(tasks);
 			return result;
 		}
 	}

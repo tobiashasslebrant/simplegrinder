@@ -12,7 +12,7 @@ namespace SimpleGrindRunner
 
 		public T GetArg<T>(string parameter, T @default)
 		{
-			parameter = "/" + parameter;
+			parameter = "-" + parameter;
 			for(var index = 0; index < _args.Length; index++)
 			{
 				if(index % 2 == 0)

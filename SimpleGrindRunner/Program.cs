@@ -22,33 +22,35 @@ namespace SimpleGrindRunner
 		{
 			Console.Write(
 			"Measure webrequests in parallel or async\r\n\r\n" +
-			"SIMPLEGRIND method url [/j json] [/b behavior] [/n numberOfRuns] [/i increaseBy] [/t seconds] [/w milliseconds] [/?]\r\n" +
-			" Parameters\r\n" +
-			"  method				get|post|put\r\n" +
-			"  url					Url used for request\r\n" +
-			"  -h headers			Headers included in request. Format \"header1=value1;header2=value2\"" +
-			"  -c cookies			Cookies included in request. Format \"cookie1=value1;cookie2=value2\"" +
-			"  -j json				Json used by action put and post\r\n" +
-			"  -b behavior			async|parallel, default is {0}\r\n" +
-			"  -n numberOfRuns		Number of runs before quitting. Default is {1}\r\n" +
-			"  -i increaseByCalls	Increase number of calls between runs. Default is {2}\r\n" +
-			"  -w milliseconds		Time to wait between requests. Default is {3}\r\n" +
-			"  -t seconds			Timeout for each request in seconds. Default is {4}\r\n" +
-			"  -l connectionLimit	Default connection limit. Default is {5}\r\n" +
-			"  -?					Show this help\r\n",
+			"SIMPLEGRIND method url [-j json] [-b behavior] [-n numberOfRuns]\r\n" +
+			"                       [-i increaseBy] [-t timeout] [-w wait]\r\n" +
+			"                       [-?]\r\n" +
+			"\r\n" +
+			"  method               Method for call. [get|post|put]\r\n" +
+			"  url                  Url used for request\r\n" +
+			"  -h headers           Headers included in request.\r\n" +
+			"                         Format \"header1=value1;header2=value2\"\r\n" +
+			"  -c cookies           Cookies included in request.\r\n" +
+			"                         Format \"cookie1=value1;cookie2=value2\"\r\n" +
+			"  -j json              Json used by action put and post\r\n" +
+			"  -b behavior          Call behavior [async|parallel]. Default is {0}\r\n" +
+			"  -n numberOfRuns      Number of runs before quitting. Default is {1}\r\n" +
+			"  -i increaseByCalls   Increase number of calls between runs. Default is {2}\r\n" +
+			"  -w wait              Wait between requests in milliseconds. Default is {3}\r\n" +
+			"  -t timeout           Timeout for each request in seconds. Default is {4}\r\n" +
+			"  -cl connectionLimit  Connection limit. Default is {5}\r\n" +
+			"  -?                   Show this help\r\n",
 			DefaultBehavior, DefaultNumberOfRuns, DefaultIncreaseBy, DefaultWait, DefaultTimeOut, DefaultConnectionLimit);
 		}
-
+			
 		public static void Main(string[] args)
 		{
-			if (args.Length < 2 || args.Any(a => a == "/?"))
+			if (args.Length < 2 || args.Any(a => a == "-?"))
 			{
 				Help();
 				return;
 			}
 
-			ServicePointManager.DefaultConnectionLimit = DefaultConnectionLimit;
-			
 			var ah = new ArgumentHelper(args.Skip(2).ToArray());
 			var method = args[0];
 			var url = args[1];
@@ -60,26 +62,26 @@ namespace SimpleGrindRunner
 			var increaseBy = ah.GetArg("i", DefaultIncreaseBy);
 			var wait = ah.GetArg("w", DefaultWait);
 			var timeOut = ah.GetArg("t", DefaultTimeOut);
-			
+			var connectionLimit = ah.GetArg("cl", DefaultConnectionLimit);
+
+			ServicePointManager.DefaultConnectionLimit = connectionLimit;
+
 			var stopWatch = new Stopwatch();
-			var writeBorder = new Action(() => Console.WriteLine(new string('#', 12*6)));
+			var writeBorder = new Action(() => GridConsole.WriteLine(new string('#', 12 * 6)));
 
 			writeBorder();
-			Console.BackgroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("Starting {0} runs with {1}s against {2}. Increase each run by {3} calls", numberOfRuns, method, url, increaseBy);
-			Console.ResetColor();
+			GridConsole.WriteLine("Starting {0} runs with {1}s against {2}. Increase each run by {3} calls", numberOfRuns, method, url, increaseBy);
 			stopWatch.Start();
 			Monitor.Start(Create(behavior, method, url, json, timeOut, headers, cookies), numberOfRuns, increaseBy, wait);
 			stopWatch.Stop();
-			Console.BackgroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("Total run time is {0} seconds", stopWatch.ElapsedMilliseconds / 1000);
-			Console.ResetColor();
+			GridConsole.WriteLine("Total run time is {0} seconds", (stopWatch.ElapsedMilliseconds / 1000));
 			writeBorder();
 		}
 
 		static Dictionary<string, string> ToDictionary(string arg)
 		{
 			var dictionary = new Dictionary<string, string>();
+			if (string.IsNullOrEmpty(arg)) return dictionary;
 			foreach (var keyValuePair in arg.Split(';'))
 			{
 				var keyValue = keyValuePair.Split('=');
