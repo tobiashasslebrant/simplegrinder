@@ -21,7 +21,7 @@ namespace SimpleGrind.Loadtest
 			return result.Result;
 		}
 
-		public async Task<LoadResult> RunAsync(int numberOfCalls, int wait, Action<LoadResult> callback)
+		async Task<LoadResult> RunAsync(int numberOfCalls, int wait, Action<LoadResult> callback)
 		{
 			var result = new LoadResult();
 			for (var index = 0; index < numberOfCalls; index++)
@@ -41,6 +41,5 @@ namespace SimpleGrind.Loadtest
 			}
 			return result;
 		}
-
 	}
 }
