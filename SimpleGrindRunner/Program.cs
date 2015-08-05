@@ -45,37 +45,44 @@ namespace SimpleGrindRunner
 			
 		public static void Main(string[] args)
 		{
-			if (args.Length < 2 || args.Any(a => a == "-?"))
+			try
 			{
-				Help();
-				return;
+
+				if (args.Length < 2 || args.Any(a => a == "-?"))
+				{
+					Help();
+					return;
+				}
+
+				var ah = new ArgumentHelper(args.Skip(2).ToArray());
+				var method = args[0];
+				var url = args[1];
+				var headers = ToDictionary(ah.GetArg("h", ""));
+				var cookies = ToDictionary(ah.GetArg("c", ""));
+				var json = ah.GetArg("j", "");
+				var behavior = ah.GetArg("b", DefaultBehavior);
+				var numberOfRuns = ah.GetArg("n", DefaultNumberOfRuns);
+				var increaseBy = ah.GetArg("i", DefaultIncreaseBy);
+				var wait = ah.GetArg("w", DefaultWait);
+				var timeOut = ah.GetArg("t", DefaultTimeOut);
+				var connectionLimit = ah.GetArg("cl", DefaultConnectionLimit);
+
+				ServicePointManager.DefaultConnectionLimit = connectionLimit;
+
+				var stopWatch = new Stopwatch();
+			
+				GridConsole.WriteLine("Starting {0} {1} runs with {2}s against {3}.", numberOfRuns, behavior, method, url, increaseBy);
+				GridConsole.WriteLine("Increase each run by {4} calls.", numberOfRuns, behavior, method, url, increaseBy);
+				stopWatch.Start();
+				Monitor.Start(Create(behavior, method, url, json, timeOut, headers, cookies), numberOfRuns, increaseBy, wait);
+				stopWatch.Stop();
+				GridConsole.WriteLine("Total run time is {0} seconds.", (stopWatch.ElapsedMilliseconds / 1000));
 			}
-
-			var ah = new ArgumentHelper(args.Skip(2).ToArray());
-			var method = args[0];
-			var url = args[1];
-			var headers = ToDictionary(ah.GetArg("h", ""));
-			var cookies = ToDictionary(ah.GetArg("c", ""));
-			var json = ah.GetArg("j", "");
-			var behavior = ah.GetArg("b", DefaultBehavior);
-			var numberOfRuns = ah.GetArg("n", DefaultNumberOfRuns);
-			var increaseBy = ah.GetArg("i", DefaultIncreaseBy);
-			var wait = ah.GetArg("w", DefaultWait);
-			var timeOut = ah.GetArg("t", DefaultTimeOut);
-			var connectionLimit = ah.GetArg("cl", DefaultConnectionLimit);
-
-			ServicePointManager.DefaultConnectionLimit = connectionLimit;
-
-			var stopWatch = new Stopwatch();
-			var writeBorder = new Action(() => GridConsole.WriteLine(new string('#', 12 * 6)));
-
-			writeBorder();
-			GridConsole.WriteLine("Starting {0} runs with {1}s against {2}. Increase each run by {3} calls", numberOfRuns, method, url, increaseBy);
-			stopWatch.Start();
-			Monitor.Start(Create(behavior, method, url, json, timeOut, headers, cookies), numberOfRuns, increaseBy, wait);
-			stopWatch.Stop();
-			GridConsole.WriteLine("Total run time is {0} seconds", (stopWatch.ElapsedMilliseconds / 1000));
-			writeBorder();
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
+			
 		}
 
 		static Dictionary<string, string> ToDictionary(string arg)

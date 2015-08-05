@@ -18,7 +18,10 @@ namespace SimpleGrindRunner
 				if(index % 2 == 0)
 				{
 					if(parameter == _args[index])
-						return (T)Convert.ChangeType(_args[index + 1], typeof(T));
+						if(_args.Length <= index)
+							return (T)Convert.ChangeType(_args[index + 1], typeof(T));
+						else
+							throw new ArgumentException("No value for parameter " + parameter);
 				}
 			}
 			return @default;

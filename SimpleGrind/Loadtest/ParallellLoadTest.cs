@@ -17,7 +17,7 @@ namespace SimpleGrind.Loadtest
 		public LoadResult Run(int numberOfCalls, int wait, Action<LoadResult> callback)
 		{
 			var result = new LoadResult();
-			var res = Parallel.For(1, numberOfCalls, index =>
+			var res = Parallel.For(0, numberOfCalls, index =>
 			{
 				var t = _action();
 				lock (_syncLock)
