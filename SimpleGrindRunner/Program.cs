@@ -44,42 +44,35 @@ namespace SimpleGrindRunner
 			
 		public static void Main(string[] args)
 		{
-			try
+			if (args.Length < 2 || args.Any(a => a == "-?"))
 			{
-				if (args.Length < 2 || args.Any(a => a == "-?"))
-				{
-					Help();
-					return;
-				}
+				Help();
+				return;
+			}
 
-				var ah = new ArgumentHelper(args.Skip(2).ToArray());
-				var method = args[0];
-				var url = args[1];
-				var headers = ToDictionary(ah.GetArg("h", ""));
-				var cookies = ToDictionary(ah.GetArg("c", ""));
-				var json = ah.GetArg("j", "");
-				var behavior = ah.GetArg("b", DefaultBehavior);
-				var numberOfRuns = ah.GetArg("n", DefaultNumberOfRuns);
-				var increaseBy = ah.GetArg("i", DefaultIncreaseBy);
-				var wait = ah.GetArg("w", DefaultWait);
-				var timeOut = ah.GetArg("t", DefaultTimeOut);
-				var connectionLimit = ah.GetArg("cl", DefaultConnectionLimit);
+			var ah = new ArgumentHelper(args.Skip(2).ToArray());
+			var method = args[0];
+			var url = args[1];
+			var headers = ToDictionary(ah.GetArg("h", ""));
+			var cookies = ToDictionary(ah.GetArg("c", ""));
+			var json = ah.GetArg("j", "");
+			var behavior = ah.GetArg("b", DefaultBehavior);
+			var numberOfRuns = ah.GetArg("n", DefaultNumberOfRuns);
+			var increaseBy = ah.GetArg("i", DefaultIncreaseBy);
+			var wait = ah.GetArg("w", DefaultWait);
+			var timeOut = ah.GetArg("t", DefaultTimeOut);
+			var connectionLimit = ah.GetArg("cl", DefaultConnectionLimit);
 
-				ServicePointManager.DefaultConnectionLimit = connectionLimit;
+			ServicePointManager.DefaultConnectionLimit = connectionLimit;
 
-				var stopWatch = new Stopwatch();
+			var stopWatch = new Stopwatch();
 			
-				GridConsole.WriteLine("Starting {0} {1} runs with {2} against {3}.", numberOfRuns, behavior, method, url, increaseBy);
-				GridConsole.WriteLine("Increase each run by {4} requests.", numberOfRuns, behavior, method, url, increaseBy);
-				stopWatch.Start();
-				Monitor.Start(Create(behavior, method, url, json, timeOut, headers, cookies), numberOfRuns, increaseBy, wait);
-				stopWatch.Stop();
-				GridConsole.WriteLine("Total run time is {0} seconds.", (stopWatch.ElapsedMilliseconds / 1000));
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e.Message);
-			}
+			GridConsole.WriteLine("Starting {0} {1} runs with {2} against {3}.", numberOfRuns, behavior, method, url, increaseBy);
+			GridConsole.WriteLine("Increase each run by {4} requests.", numberOfRuns, behavior, method, url, increaseBy);
+			stopWatch.Start();
+			Monitor.Start(Create(behavior, method, url, json, timeOut, headers, cookies), numberOfRuns, increaseBy, wait);
+			stopWatch.Stop();
+			GridConsole.WriteLine("Total run time is {0} seconds.", (stopWatch.ElapsedMilliseconds / 1000));
 			
 		}
 
@@ -116,11 +109,11 @@ namespace SimpleGrindRunner
 				switch (method.ToLower())
 				{
 					case "get":
-						return new AsyncLoadTest(async () => await client.GetAsync(url));
+						return new AsyncLoadTest(() => client.GetAsync(url));
 					case "post":
-						return new AsyncLoadTest(async () => await client.PostJsonAsync(url, json));
+						return new AsyncLoadTest(() => client.PostJsonAsync(url, json));
 					case "put":
-						return new AsyncLoadTest(async () => await client.PutJsonAsync(url, json));
+						return new AsyncLoadTest(() => client.PutJsonAsync(url, json));
 				}
 			}
 			throw new ArgumentException("Not a valid argument");
