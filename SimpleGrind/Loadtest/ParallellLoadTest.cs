@@ -14,7 +14,7 @@ namespace SimpleGrind.Loadtest
 		{
 			_action = action;
 		}
-		public LoadResult Run(int numberOfCalls, int wait, Action<LoadResult> callback)
+		public LoadResult Run(int numberOfCalls, int wait)
 		{
 			var result = new LoadResult();
 			var res = Parallel.For(0, numberOfCalls, index =>
@@ -26,8 +26,6 @@ namespace SimpleGrind.Loadtest
 						result.Ok++;
 					else
 						result.Failed++;
-				
-					callback(result);
 				}
 				if(wait > 0)
 					Thread.Sleep(wait);

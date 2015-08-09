@@ -15,26 +15,27 @@ namespace SimpleGrind.Loadtest
 			_action = action;
 		}
 
-		public LoadResult Run(int numberOfCalls, int wait, Action<LoadResult> callback)
+		public LoadResult Run(int numberOfCalls, int wait)
 		{
 			_result = new LoadResult();
-			RunAsync(numberOfCalls, wait, callback).Wait();
+			RunAsync(numberOfCalls, wait)
+                .Wait();
 			return _result;
 		}
 		
-		async Task RunAsync(int numberOfCalls, int wait, Action<LoadResult> callback)
+		async Task RunAsync(int numberOfCalls, int wait)
 		{
 			var tasks = new Task[numberOfCalls];
 			for (var index = 0; index < numberOfCalls; index++)
 			{
-				tasks[index] = RunAsync(callback);
+				tasks[index] = RunAsync();
 				if (wait > 0)
 					Thread.Sleep(wait);
 			}
 			await Task.WhenAll(tasks);
 		}
 
-		async Task RunAsync(Action<LoadResult> callback)
+		async Task RunAsync()
 		{
 			try
 			{
@@ -49,7 +50,6 @@ namespace SimpleGrind.Loadtest
 			{
 				_result.Failed++;
 			}
-			callback(_result);
 		}
 	}
 }

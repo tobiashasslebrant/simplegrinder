@@ -1,40 +1,55 @@
 ﻿using System;
+using System.IO;
 
-namespace SimpleGrindRunner
+namespace SimpleGrind.Runner
 {
-	public static class GridConsole
+    public interface IGridWriter
+    {
+        void WriteHeaders(string[] headers);
+        void WriteCell(string cell);
+        void WriteCells(string[] cells);
+        void WriteLine(string line, params object[] args);
+    }
+
+    public class GridConsole : IGridWriter
 	{
-		private static string _console = "";
+        public GridConsole(TextWriter writer, int columnWidth, int noOfColumns)
+        {
+            _writer = writer;
+            _columnWidth = columnWidth;
+            _noOfColumns = noOfColumns;
+        }
+		string _console = "";
+        TextWriter _writer;
+        int _columnWidth;
+        int _noOfColumns;
+        int _columnIndex = 0;
 
-		public static void WriteCell(string cell)
+        public void WriteHeaders(string[] headers)
+        {
+            if (headers.Length != _noOfColumns)
+                throw new ArgumentException($"Number of headers ({headers.Length}) does not match number of columns ({_noOfColumns})");
+        }
+        public void WriteCell(string cell)
 		{
-			Console.Clear();
-			var paddedCell = cell.PadRight(12);
-			_console += paddedCell;
-			Console.Write(_console);
+        	var paddedCell = cell.PadRight(_columnWidth);
+		    _writer.Write(_console);
+            if(++_columnIndex == _noOfColumns)
+            {
+                _writer.WriteLine();
+                _columnIndex = 0;
+            }
+
 		}
-		public static void WriteCells(string[] cells)
+		public void WriteCells(string[] cells)
 		{
-			foreach (var s in cells)
+            foreach (var s in cells)
 				WriteCell(s);
-			_console += "\r\n";
-			Console.WriteLine();
 		}
 
-		public static void WriteNoPersistantCells(string[] cells)
-		{
-			Console.Clear();
-			Console.Write(_console);
-			foreach (var s in cells)
-				Console.Write(s.PadRight(12));
-			Console.WriteLine();
-		}
-
-		public static void WriteLine(string line, params object[] args)
-		{
-			Console.Clear();
-			_console += string.Format(line, args) + "\r\n";
-			Console.Write(_console);
-		}
+		public void WriteLine(string line, params object[] args) => 
+            _writer.WriteLine(line, args);
 	}
+
+   
 }
