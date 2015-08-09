@@ -1,6 +1,10 @@
-﻿using SimpleGrind.Runner.Parameters;
+﻿using SimpleGrind.Loadtest;
+using SimpleGrind.Parameters;
 using System;
 using System.Linq;
+using Ninject;
+using SimpleGrind.Net;
+using System.Net;
 
 namespace SimpleGrind.Runner
 {
@@ -9,7 +13,7 @@ namespace SimpleGrind.Runner
         static void Help(RequestParameters reqParams, RunnerParameters runParams)
         {
             Console.Write(
-            "Measure webrequests in parallel or async\r\n\r\n" +
+            "Measure webrequests in sync, async or parallel\r\n\r\n" +
             "SIMPLEGRIND method url [-j json] [-b behavior] [-n numberOfRuns]\r\n" +
             "                       [-i increaseBy] [-t timeout] [-w wait]\r\n" +
             "                       [-?]\r\n" +
@@ -21,7 +25,7 @@ namespace SimpleGrind.Runner
             "  -c cookies           Cookies included in request.\r\n" +
             "                         Format \"cookie1=value1;cookie2=value2\"\r\n" +
             "  -j json              Json used by action put and post\r\n" +
-           $"  -b behavior          Request behavior [async|parallel]. Current is {runParams.Behavior}\r\n" +
+           $"  -b behavior          Request behavior [sync|async|parallel]. Current is {runParams.Behavior}\r\n" +
            $"  -n numberOfRuns      Number of runs before quitting. Current is {runParams.NumberOfRuns}\r\n" +
            $"  -i increaseByCalls   Increase number of requests between runs. Current is {runParams.IncreaseBy}\r\n" +
            $"  -w wait              Wait between requests in milliseconds. Current is {runParams.Wait}\r\n" +
@@ -41,9 +45,20 @@ namespace SimpleGrind.Runner
                 return;
             }
 
-            var gridWriter = new GridConsole(Console.Out, 12, 6);
-            var runner = new Runner(gridWriter,new Monitor(gridWriter));
-            runner.Run(requestParams, runnerParams);
+            var kernel = new StandardKernel();
+            kernel.Bind<IGridWriter>().To<GridConsole>()
+                .WithConstructorArgument("writer", Console.Out)
+                .WithConstructorArgument("columnWidth", 12)
+                .WithConstructorArgument("noOfColumns", 6);
+            kernel.Bind<IMonitor>().To<Monitor>();
+            kernel.Bind<ILoadTestFactory>().To<LoadTestFactory>();
+            kernel.Bind<IRequestParameters>().ToMethod(c => requestParams).InSingletonScope(); ;
+            kernel.Bind<IRunnerParameters>().ToMethod(c => runnerParams).InSingletonScope();
+            kernel.Bind<ISimpleWebClient>().To<SimpleWebClient>();
+
+            ServicePointManager.DefaultConnectionLimit = runnerParams.ConnectionLimit;
+            var monitor = kernel.Get<IMonitor>();
+            monitor.Start();
         }
-    }
+    }     
 }

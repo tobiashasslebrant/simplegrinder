@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SimpleGrind.Parameters;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -7,17 +7,28 @@ using System.Threading.Tasks;
 
 namespace SimpleGrind.Net
 {
-	public class SimpleWebClient
-	{
+
+    public interface ISimpleWebClient
+    {
+        HttpResponseMessage Delete(string url);
+        Task<HttpResponseMessage> DeleteAsync(string url);
+        HttpResponseMessage Get(string url);
+        Task<HttpResponseMessage> GetAsync(string url);
+        HttpResponseMessage PostJson(string url, string json);
+        Task<HttpResponseMessage> PostJsonAsync(string url, string json);
+        HttpResponseMessage PutJson(string url, string json);
+        Task<HttpResponseMessage> PutJsonAsync(string url, string json);
+    }
+
+    public class SimpleWebClient : ISimpleWebClient
+    {
 		readonly HttpClient _httpClient;
 
-		public SimpleWebClient(int timeOut, Dictionary<string, string> defaultRequestHeaders, Dictionary<string, string> cookies)
-		{
-
-			var cookieContainer = new CookieContainer();
-			if(cookies != null)
-				foreach (var cookie in cookies)
-					cookieContainer.Add(new Cookie(cookie.Key,cookie.Value));
+        public SimpleWebClient(IRequestParameters requestParameters)
+        {
+       	    var cookieContainer = new CookieContainer();
+			foreach (var cookie in requestParameters.Cookies)
+				cookieContainer.Add(new Cookie(cookie.Key,cookie.Value));
 				
 			_httpClient = new HttpClient(new HttpClientHandler
 			{
@@ -25,13 +36,12 @@ namespace SimpleGrind.Net
 				CookieContainer = cookieContainer
 			})
 			{
-				Timeout = TimeSpan.FromSeconds(timeOut)
+				Timeout = TimeSpan.FromSeconds(requestParameters.TimeOut)
 			};
 
-			if(defaultRequestHeaders != null)
-				foreach (var defaultRequestHeader in defaultRequestHeaders)
-					_httpClient.DefaultRequestHeaders.Add(defaultRequestHeader.Key,defaultRequestHeader.Value);
-		}
+			foreach (var header in requestParameters.Headers)
+				_httpClient.DefaultRequestHeaders.Add(header.Key,header.Value);
+	    }
 
 		public async Task<HttpResponseMessage> GetAsync(string url)
 		{

@@ -42,11 +42,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="GridConsole.cs" />
     <Compile Include="Loadtest\AsyncLoadTest.cs" />
     <Compile Include="Loadtest\ILoadTest.cs" />
     <Compile Include="Loadtest\LoadResult.cs" />
+    <Compile Include="Loadtest\LoadTestFactory.cs" />
     <Compile Include="Loadtest\ParallellLoadTest.cs" />
+    <Compile Include="Loadtest\SyncLoadTest.cs" />
+    <Compile Include="Monitor.cs" />
     <Compile Include="Net\SimpleWebClient.cs" />
+    <Compile Include="Parameters\ParameterBuilder.cs" />
+    <Compile Include="Parameters\RequestParameters.cs" />
+    <Compile Include="Parameters\RunnerParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
