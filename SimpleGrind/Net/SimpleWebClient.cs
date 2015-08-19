@@ -7,17 +7,18 @@ using System.Threading.Tasks;
 
 namespace SimpleGrind.Net
 {
-
     public interface ISimpleWebClient
     {
-        HttpResponseMessage Delete(string url);
-        Task<HttpResponseMessage> DeleteAsync(string url);
-        HttpResponseMessage Get(string url);
         Task<HttpResponseMessage> GetAsync(string url);
-        HttpResponseMessage PostJson(string url, string json);
         Task<HttpResponseMessage> PostJsonAsync(string url, string json);
-        HttpResponseMessage PutJson(string url, string json);
         Task<HttpResponseMessage> PutJsonAsync(string url, string json);
+        Task<HttpResponseMessage> DeleteAsync(string url);
+
+        HttpResponseMessage Get(string url);
+        HttpResponseMessage PostJson(string url, string json);
+        HttpResponseMessage PutJson(string url, string json);
+        HttpResponseMessage Delete(string url);
+
     }
 
     public class SimpleWebClient : ISimpleWebClient
@@ -43,9 +44,11 @@ namespace SimpleGrind.Net
 				_httpClient.DefaultRequestHeaders.Add(header.Key,header.Value);
 	    }
 
-		public async Task<HttpResponseMessage> GetAsync(string url) => await _httpClient.GetAsync(url);
-        public async Task<HttpResponseMessage> PostJsonAsync(string url, string json) => await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
-		public async Task<HttpResponseMessage> PutJsonAsync(string url, string json) => await _httpClient.PutAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+        StringContent Content(string json) => new StringContent(json, Encoding.UTF8, "application/json");
+
+        public async Task<HttpResponseMessage> GetAsync(string url) => await _httpClient.GetAsync(url);
+        public async Task<HttpResponseMessage> PostJsonAsync(string url, string json) => await _httpClient.PostAsync(url, Content(json));
+		public async Task<HttpResponseMessage> PutJsonAsync(string url, string json) => await _httpClient.PutAsync(url, Content(json));
 		public async Task<HttpResponseMessage> DeleteAsync(string url) => await _httpClient.DeleteAsync(url);
 
         public HttpResponseMessage Get(string url) => GetAsync(url).Result;
