@@ -22,14 +22,15 @@ namespace SimpleGrind.Parameters
         {
             for (var index = 0; index < _args.Length; index++)
             {
-                if (index % 2 == 0)
-                {
-                    if (_seperator + parameter == _args[index])
-                        if (_args.Length <= index)
-                            map((T)Convert.ChangeType(_args[index + 1], typeof(T)));
-                        else
-                            throw new ArgumentException("No value for parameter " + parameter);
-                }
+                if (_seperator + parameter == _args[index])
+                    try
+                    {
+                        map((T) Convert.ChangeType(_args[index + 1], typeof(T)));
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        throw new Exception($"No value for option {parameter}");
+                    }
             }
         }
     }

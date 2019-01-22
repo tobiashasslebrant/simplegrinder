@@ -44,7 +44,7 @@ namespace SimpleGrind.Runner
                 Help(requestParams, runnerParams);
                 return;
             }
-
+        
             var kernel = new StandardKernel();
             kernel.Bind<IGridWriter>().To<GridConsole>()
                 .WithConstructorArgument("writer", Console.Out)

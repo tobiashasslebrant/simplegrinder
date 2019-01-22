@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using SimpleGrind.Extensions;
 
 namespace SimpleGrind.Parameters

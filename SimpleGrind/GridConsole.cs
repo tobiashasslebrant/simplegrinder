@@ -20,7 +20,6 @@ namespace SimpleGrind
             _noOfColumns = noOfColumns;
         }
 
-        string _console = "";
         TextWriter _writer;
         int _columnWidth;
         int _noOfColumns;
@@ -28,13 +27,14 @@ namespace SimpleGrind
 
         public void WriteHeaders(string[] headers)
         {
-            if (headers.Length != _noOfColumns)
+	        if (headers.Length != _noOfColumns)
                 throw new ArgumentException($"Number of headers ({headers.Length}) does not match number of columns ({_noOfColumns})");
+	        WriteCells(headers);
         }
         public void WriteCell(string cell)
 		{
         	var paddedCell = cell.PadRight(_columnWidth);
-		    _writer.Write(_console);
+		    _writer.Write(paddedCell);
             if(++_columnIndex == _noOfColumns)
             {
                 _writer.WriteLine();
@@ -51,6 +51,4 @@ namespace SimpleGrind
 		public void WriteLine(string line, params object[] args) => 
             _writer.WriteLine(line, args);
 	}
-
-   
 }
