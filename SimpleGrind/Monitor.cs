@@ -32,8 +32,9 @@ namespace SimpleGrind
 
             _gridWriter.WriteLine($"Starting {_runnerParameters.NumberOfRuns} runs with {_requestParameters.Method} against {_requestParameters.Url}.");
             _gridWriter.WriteLine($"Increase each run by {_runnerParameters.IncreaseBy} requests.");
-            _gridWriter.WriteHeaders(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotalTime", "AvgTime" });
+            _gridWriter.WriteHeaders(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotTime", "AvgTime" });
 
+			stopWatchAll.Start();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
 				numberOfCalls += _runnerParameters.IncreaseBy;
@@ -46,8 +47,8 @@ namespace SimpleGrind
 				{
 					result.Ok.ToString(),
 					result.Failed.ToString(),
-					totalSec.ToString(),
-					(totalSec / numberOfCalls).ToString()
+					$"{totalSec}s",
+					$"{(totalSec / numberOfCalls)}s"
 				});
 				stopWatchOne.Reset();
 			}
