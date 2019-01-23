@@ -14,10 +14,10 @@ namespace SimpleGrind.Loadtest
 		public AsyncLoadTest(Func<Task<HttpResponseMessage>> action) 
 			=> _action = action;
 
-		public LoadResult Run(int numberOfCalls, int wait) 
-			 => Task.Run(() => RunAsync(numberOfCalls, wait)).Result;
+		public LoadResult Run(int numberOfCalls, int wait, string logLevel) 
+			 => Task.Run(() => RunAsync(numberOfCalls, wait,logLevel)).Result;
 
-		async Task<LoadResult> RunAsync(int numberOfCalls, int wait)
+		async Task<LoadResult> RunAsync(int numberOfCalls, int wait, string logLevel)
 		{
 			var tasks = new List<Task<HttpResponseMessage>>();
 			for (var index = 0; index < numberOfCalls; index++)
@@ -27,18 +27,24 @@ namespace SimpleGrind.Loadtest
 					Thread.Sleep(wait);
 			}
 
+			var errors = new List<string>();
 			try
 			{
 				await Task.WhenAll(tasks);
 			}
-			catch (Exception)
+			catch (AggregateException ex)
 			{
-			
+				errors.AddRange(ex.InnerExceptions.Select(s => s.Message).ToArray());
 			}
+
+			var nonSuccessfull = tasks.Where(s => !s.Result.IsSuccessStatusCode).ToArray();
+			if (logLevel == "VERBOSE" && nonSuccessfull.Any())
+				errors.AddRange(nonSuccessfull.Select(s => s.Result.Content.ReadAsStringAsync().Result));
 			return new LoadResult
 			{
-				Ok =	tasks.Count(w => w.IsCompletedSuccessfully),
-				Failed = tasks.Count(w => !w.IsCompletedSuccessfully),
+				Ok =	numberOfCalls - nonSuccessfull.Count(),
+				Failed = nonSuccessfull.Count(),
+				Errors = errors
 			};
 
 		}

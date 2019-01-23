@@ -55,7 +55,7 @@ namespace SimpleGrind
             _gridWriter.WriteHeaders(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotTime", "AvgTime" });
 
 			stopWatchAll.Start();
-			var errors = new List<(int,Exception)>();
+			var errors = new List<(int,string)>();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
 				
@@ -64,7 +64,7 @@ namespace SimpleGrind
 					stopWatchOne.Start();
 				try
 				{
-					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait);
+					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait, _runnerParameters.LogLevel);
 					var avgTime = stopWatchOne.ElapsedMilliseconds / numberOfCalls;
 					_gridWriter.WriteCells(new[]
 					{
@@ -77,10 +77,13 @@ namespace SimpleGrind
 							? $"{avgTime} ms"
 							: $"{avgTime / 1000D:F1} s"
 					});
+					if(result.Errors.Any())
+						foreach (var error in result.Errors)
+							errors.Add((run,error));
 				}
 				catch (Exception ex)
 				{
-					errors.Add((run,ex));
+					errors.Add((run,ex.ToString()));
 					_gridWriter.WriteCells(new[] {"error","","",""});
 				}
 				totalCalls += numberOfCalls;
@@ -90,18 +93,20 @@ namespace SimpleGrind
             _gridWriter.WriteLine($"Total run time is { (stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds for {totalCalls} calls. Average time is { (stopWatchAll.ElapsedMilliseconds / totalCalls)} milliseconds");
 			if (errors.Any())
 			{
-				_gridWriter.WriteLine($"Total of {errors.Count} errors");
+				_gridWriter.WriteLine($"Total of {errors.Count()} errors");
 
-				var showNoOfErrors = 3;
+				if (_runnerParameters.LogLevel == "VERBOSE")
+				{
+					if (errors.Count > _runnerParameters.LogItems)
+						_gridWriter.WriteLine($"Showing first {_runnerParameters.LogItems} errors");
 
-				if (errors.Count > showNoOfErrors)
-					_gridWriter.WriteLine($"Showing first {showNoOfErrors} errors");
+					foreach (var (run, error) in errors.Take(_runnerParameters.LogItems))
+						_gridWriter.WriteLine($"Error in run {run} MESSAGE: {error}");
 
-				foreach (var (run,error) in errors.Take(showNoOfErrors))
-					_gridWriter.WriteLine($"Error in run {run} Exception occured {error.Message}, {error.InnerException?.Message}");	
-				
-				if (errors.Count > showNoOfErrors)
-					_gridWriter.WriteLine($"... more errors ...");
+					if (errors.Count > _runnerParameters.LogItems)
+						_gridWriter.WriteLine($"... more errors ...");
+
+				}
 
 			}
         }

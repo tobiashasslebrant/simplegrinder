@@ -8,6 +8,7 @@ namespace SimpleGrind
         void WriteHeaders(string[] headers);
         void WriteCell(string cell);
         void WriteCells(string[] cells);
+	    void WriteLine(string line);
         void WriteLine(string line, params object[] args);
     }
 
@@ -48,6 +49,9 @@ namespace SimpleGrind
 				WriteCell(s);
 		}
 
+		public void WriteLine(string line) => 
+			_writer.WriteLine(line);
+		
 		public void WriteLine(string line, params object[] args) => 
             _writer.WriteLine(line, args);
 	}

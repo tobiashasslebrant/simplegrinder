@@ -33,6 +33,8 @@ namespace SimpleGrind.Runner
            $"  -t timeout           Timeout for each request in seconds. Current is {reqParams.TimeOut}\r\n" +
            $"  -cl connectionLimit  Connection limit. Current is {runParams.ConnectionLimit}\r\n" +
            $"  -wu dateTime         Wait for datetime (yyyyMMdd hhmmss).\r\n" +
+           $"  -ll loglevel         Loglevel can be VERBOSE or NONE. Current is {runParams.LogLevel}\r\n" +
+           $"  -li logItems         Number of log items to show. Current is {runParams.LogItems}\r\n" +
             "  -?                   Show this help\r\n");
         }
         public static void Main(string[] args)
