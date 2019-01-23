@@ -50,8 +50,8 @@ namespace SimpleGrind
             var stopWatchOne = new Stopwatch();
             var stopWatchAll = new Stopwatch();
 
-            _gridWriter.WriteLine($"Starting {_runnerParameters.NumberOfRuns} runs with {_requestParameters.Method} against {_requestParameters.Url}.");
-            _gridWriter.WriteLine($"Increase each run by {_runnerParameters.IncreaseBy} requests.");
+            _gridWriter.WriteLine($"Starting {_runnerParameters.NumberOfRuns} runs against {_requestParameters.Method}:{_requestParameters.Url}");
+            _gridWriter.WriteLine($"Run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between runs.");
             _gridWriter.WriteHeaders(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotTime", "AvgTime" });
 
 			stopWatchAll.Start();

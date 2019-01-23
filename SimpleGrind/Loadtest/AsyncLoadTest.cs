@@ -32,18 +32,19 @@ namespace SimpleGrind.Loadtest
 			{
 				await Task.WhenAll(tasks);
 			}
-			catch (AggregateException ex)
+			catch (Exception ex)
 			{
-				errors.AddRange(ex.InnerExceptions.Select(s => s.Message).ToArray());
+				errors.Add(ex.ToString());
 			}
 
-			var nonSuccessfull = tasks.Where(s => !s.Result.IsSuccessStatusCode).ToArray();
+			var nonSuccessfull = tasks.Where(s => s.IsCompletedSuccessfully && !s.Result.IsSuccessStatusCode).ToArray();
+			var successFull = tasks.Count(s => s.IsCompletedSuccessfully && s.Result.IsSuccessStatusCode);
 			if (logLevel == "VERBOSE" && nonSuccessfull.Any())
 				errors.AddRange(nonSuccessfull.Select(s => s.Result.Content.ReadAsStringAsync().Result));
 			return new LoadResult
 			{
-				Ok =	numberOfCalls - nonSuccessfull.Count(),
-				Failed = nonSuccessfull.Count(),
+				Ok =	successFull,
+				Failed = numberOfCalls - successFull ,
 				Errors = errors
 			};
 
