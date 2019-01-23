@@ -31,6 +31,7 @@ namespace SimpleGrind.Runner
            $"  -w wait              Wait between requests in milliseconds. Current is {runParams.Wait}\r\n" +
            $"  -t timeout           Timeout for each request in seconds. Current is {reqParams.TimeOut}\r\n" +
            $"  -cl connectionLimit  Connection limit. Current is {runParams.ConnectionLimit}\r\n" +
+           $"  -wu dateTime         Wait for datetime (yyyyMMdd hhmmss).\r\n" +
             "  -?                   Show this help\r\n");
         }
         public static void Main(string[] args)
@@ -52,7 +53,7 @@ namespace SimpleGrind.Runner
             serviceCollection.AddTransient<ILoadTestFactory,LoadTestFactory>();
             serviceCollection.AddSingleton<IRequestParameters>(_ => requestParams);
             serviceCollection.AddSingleton<IRunnerParameters>(_ => runnerParams);
-            serviceCollection.AddTransient<ISimpleWebClient,SimpleWebClient>();
+            serviceCollection.AddSingleton<ISimpleWebClient,SimpleWebClient>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
            

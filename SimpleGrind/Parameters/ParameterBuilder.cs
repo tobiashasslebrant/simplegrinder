@@ -4,8 +4,8 @@ namespace SimpleGrind.Parameters
 {
     public class ParameterBuilder
     {
-        private string[] _args;
-        private char _seperator;
+        private readonly string[] _args;
+        private readonly char _seperator;
 
         public ParameterBuilder(string[] args, char seperator)
         {
