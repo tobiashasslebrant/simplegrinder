@@ -26,11 +26,19 @@ namespace SimpleGrind.Loadtest
 				if (wait > 0)
 					Thread.Sleep(wait);
 			}
-			var results = await Task.WhenAll(tasks);
+
+			try
+			{
+				await Task.WhenAll(tasks);
+			}
+			catch (Exception)
+			{
+			
+			}
 			return new LoadResult
 			{
-				Ok = results.Count(a => (int)a.StatusCode < 400),
-				Failed = results.Count(a => (int)a.StatusCode >= 400),
+				Ok =	tasks.Count(w => w.IsCompletedSuccessfully),
+				Failed = tasks.Count(w => !w.IsCompletedSuccessfully),
 			};
 
 		}

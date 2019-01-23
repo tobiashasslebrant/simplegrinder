@@ -31,7 +31,7 @@ namespace SimpleGrind.Loadtest
 					Thread.Sleep(wait);
 			});
 
-			while (!res.IsCompleted) { Thread.Sleep(100); }
+			while (!res.IsCompleted) {  }
 			return result;
 		}
 	}

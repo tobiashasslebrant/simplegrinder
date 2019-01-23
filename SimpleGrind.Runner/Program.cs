@@ -18,7 +18,7 @@ namespace SimpleGrind.Runner
             "                       [-i increaseBy] [-t timeout] [-w wait]\r\n" +
             "                       [-?]\r\n" +
             "\r\n" +
-           $"  method               Method for request. [get|post|put]. Current is {reqParams.Method}\r\n" +
+           $"  method               Method for request. [get|post|put|delete]. Current is {reqParams.Method}\r\n" +
            $"  url                  Url used for request. Current is {reqParams.Url}\r\n" +
             "  -h headers           Headers included in request.\r\n" +
             "                         Format \"header1=value1;header2=value2\"\r\n" +
@@ -26,8 +26,9 @@ namespace SimpleGrind.Runner
             "                         Format \"cookie1=value1;cookie2=value2\"\r\n" +
             "  -j json              Json used by action put and post\r\n" +
            $"  -b behavior          Request behavior [sync|async|parallel]. Current is {runParams.Behavior}\r\n" +
-           $"  -n numberOfRuns      Number of runs before quitting. Current is {runParams.NumberOfRuns}\r\n" +
-           $"  -i increaseByCalls   Increase number of requests between runs. Current is {runParams.IncreaseBy}\r\n" +
+           $"  -nr numberOfRuns      Number of runs before quitting. Current is {runParams.NumberOfRuns}\r\n" +
+           $"  -nc numberOfCalls     Number of calls on each run. Current is {runParams.NumberOfCalls}\r\n" +
+           $"  -i increaseByCalls   Increase number of calls between runs. Current is {runParams.IncreaseBy}\r\n" +
            $"  -w wait              Wait between requests in milliseconds. Current is {runParams.Wait}\r\n" +
            $"  -t timeout           Timeout for each request in seconds. Current is {reqParams.TimeOut}\r\n" +
            $"  -cl connectionLimit  Connection limit. Current is {runParams.ConnectionLimit}\r\n" +

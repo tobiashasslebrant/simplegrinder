@@ -28,6 +28,8 @@ namespace SimpleGrind.Loadtest
                         return new SyncLoadTest(() => _webClient.PostJson(url, json));
                     case "put":
                         return new SyncLoadTest(() => _webClient.PutJson(url, json));
+                    case "delete":
+                        return new SyncLoadTest(() => _webClient.Delete(url));
                 }
             }
 
@@ -41,18 +43,21 @@ namespace SimpleGrind.Loadtest
                         return new ParallellLoadTest(() => _webClient.PostJson(url, json));
                     case "put":
                         return new ParallellLoadTest(() => _webClient.PutJson(url, json));
+                    case "delete":
+                        return new SyncLoadTest(() => _webClient.Delete(url));
                 }
             }
             if (behavior == "async")
             {
                 switch (method)
                 {
-                    case "get":
-                        return new AsyncLoadTest(() => _webClient.GetAsync(url));
+                    case "get":return new AsyncLoadTest(() => _webClient.GetAsync(url));
                     case "post":
                         return new AsyncLoadTest(() => _webClient.PostJsonAsync(url, json));
                     case "put":
                         return new AsyncLoadTest(() => _webClient.PutJsonAsync(url, json));
+                    case "delete":
+                        return new AsyncLoadTest(() => _webClient.DeleteAsync(url));
                 }
             }
             throw new NotImplementedException($"No loadtest implemented for a combination of {behavior} and {method}");

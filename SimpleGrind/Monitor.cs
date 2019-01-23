@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using SimpleGrind.Loadtest;
 using SimpleGrind.Parameters;
 
@@ -43,7 +45,8 @@ namespace SimpleGrind
 			}
 			
             var loadTest = _loadTestFactory.Create(_runnerParameters.Behavior, _requestParameters.Method, _requestParameters.Url, _requestParameters.Json);
-            var numberOfCalls = _runnerParameters.IncreaseBy;
+            var numberOfCalls = _runnerParameters.NumberOfCalls;
+			var totalCalls = 0;
             var stopWatchOne = new Stopwatch();
             var stopWatchAll = new Stopwatch();
 
@@ -52,28 +55,54 @@ namespace SimpleGrind
             _gridWriter.WriteHeaders(new[] { "Run", "NoOfCalls", "Ok", "Failed", "TotTime", "AvgTime" });
 
 			stopWatchAll.Start();
+			var errors = new List<(int,Exception)>();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
-				numberOfCalls += _runnerParameters.IncreaseBy;
-                _gridWriter.WriteCell(run.ToString());
-                _gridWriter.WriteCell(numberOfCalls.ToString());
-				stopWatchOne.Start();
-				var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait);
-				var avgTime = stopWatchOne.ElapsedMilliseconds / numberOfCalls;
-			     _gridWriter.WriteCells(new[]
+				try
 				{
-					result.Ok.ToString(),
-					result.Failed.ToString(),
-					stopWatchOne.ElapsedMilliseconds < 1000
-						? $"{stopWatchOne.ElapsedMilliseconds} ms"
-						: $"{stopWatchOne.ElapsedMilliseconds / 1000} s",
-					avgTime < 1000
-						? $"{avgTime} ms"
-						: $"{avgTime / 1000} s"
-				});
+					_gridWriter.WriteCell(run.ToString());
+					_gridWriter.WriteCell(numberOfCalls.ToString());
+					stopWatchOne.Start();
+					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait);
+					var avgTime = stopWatchOne.ElapsedMilliseconds / numberOfCalls;
+					_gridWriter.WriteCells(new[]
+					{
+						result.Ok.ToString(),
+						result.Failed.ToString(),
+						stopWatchOne.ElapsedMilliseconds < 1000
+							? $"{stopWatchOne.ElapsedMilliseconds} ms"
+							: $"{stopWatchOne.ElapsedMilliseconds / 1000D:F1} s",
+						avgTime < 1000
+							? $"{avgTime} ms"
+							: $"{avgTime / 1000D:F1} s"
+					});
+				}
+				catch (Exception ex)
+				{
+					errors.Add((run,ex));
+					_gridWriter.WriteCells(new[] {"error","","",""});
+				}
+				totalCalls += numberOfCalls;
+				numberOfCalls += _runnerParameters.IncreaseBy;
 				stopWatchOne.Reset();
 			}
-            _gridWriter.WriteLine($"Total run time is { (stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds.");
+            _gridWriter.WriteLine($"Total run time is { (stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds for {totalCalls} calls. Average time is { (stopWatchAll.ElapsedMilliseconds / totalCalls)} milliseconds");
+			if (errors.Any())
+			{
+				_gridWriter.WriteLine($"Total of {errors.Count} errors");
+
+				var showNoOfErrors = 3;
+
+				if (errors.Count > showNoOfErrors)
+					_gridWriter.WriteLine($"Showing first {showNoOfErrors} errors");
+
+				foreach (var (run,error) in errors.Take(showNoOfErrors))
+					_gridWriter.WriteLine($"Error in run {run} Exception occured {error.Message}, {error.InnerException?.Message}");	
+				
+				if (errors.Count > showNoOfErrors)
+					_gridWriter.WriteLine($"... more errors ...");
+
+			}
         }
     }
 }
