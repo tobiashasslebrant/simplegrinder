@@ -58,11 +58,12 @@ namespace SimpleGrind
 			var errors = new List<(int,Exception)>();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
-				try
-				{
+				
 					_gridWriter.WriteCell(run.ToString());
 					_gridWriter.WriteCell(numberOfCalls.ToString());
 					stopWatchOne.Start();
+				try
+				{
 					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait);
 					var avgTime = stopWatchOne.ElapsedMilliseconds / numberOfCalls;
 					_gridWriter.WriteCells(new[]
