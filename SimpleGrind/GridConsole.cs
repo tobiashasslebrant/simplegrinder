@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using SimpleGrind.Parameters;
 
 namespace SimpleGrind
 {
@@ -9,22 +10,23 @@ namespace SimpleGrind
         void WriteCell(string cell);
         void WriteCells(string[] cells);
 	    void WriteLine(string line);
-        void WriteLine(string line, params object[] args);
     }
 
     public class GridConsole : IGridWriter
 	{
-        public GridConsole(TextWriter writer, int columnWidth, int noOfColumns)
+        public GridConsole(TextWriter writer, int columnWidth, int noOfColumns, LogLevel logLevel)
         {
             _writer = writer;
             _columnWidth = columnWidth;
             _noOfColumns = noOfColumns;
+	        _logLevel = logLevel;
         }
 
-        TextWriter _writer;
-        int _columnWidth;
-        int _noOfColumns;
-        int _columnIndex = 0;
+		readonly TextWriter _writer;
+		readonly int _columnWidth;
+		readonly int _noOfColumns;
+		private readonly LogLevel _logLevel;
+		int _columnIndex = 0;
 
         public void WriteHeaders(string[] headers)
         {
@@ -41,7 +43,6 @@ namespace SimpleGrind
                 _writer.WriteLine();
                 _columnIndex = 0;
             }
-
 		}
 		public void WriteCells(string[] cells)
 		{
@@ -49,10 +50,17 @@ namespace SimpleGrind
 				WriteCell(s);
 		}
 
-		public void WriteLine(string line) => 
+		public void WriteLine(string line)
+		{
+			if(_logLevel == LogLevel.Report)
+				return;
+			
+			if (_columnIndex > 0)
+			{
+				_columnIndex = 0;
+				_writer.WriteLine();
+			}
 			_writer.WriteLine(line);
-		
-		public void WriteLine(string line, params object[] args) => 
-            _writer.WriteLine(line, args);
+		}
 	}
 }

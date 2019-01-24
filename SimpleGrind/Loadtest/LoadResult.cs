@@ -7,6 +7,7 @@ namespace SimpleGrind.Loadtest
 	{
 		public int Ok;
 		public int Failed;
+		public int TimedOut;
 		public IReadOnlyCollection<string> Errors;
 	}
 }

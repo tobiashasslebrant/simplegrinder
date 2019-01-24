@@ -10,7 +10,7 @@ namespace SimpleGrind.Loadtest
 
     public class LoadTestFactory : ILoadTestFactory
     {
-        private ISimpleWebClient _webClient;
+        private readonly ISimpleWebClient _webClient;
 
         public LoadTestFactory(ISimpleWebClient simpleWebClient)
         {
@@ -51,7 +51,8 @@ namespace SimpleGrind.Loadtest
             {
                 switch (method)
                 {
-                    case "get":return new AsyncLoadTest(() => _webClient.GetAsync(url));
+                    case "get":
+                        return new AsyncLoadTest(() => _webClient.GetAsync(url));
                     case "post":
                         return new AsyncLoadTest(() => _webClient.PostJsonAsync(url, json));
                     case "put":

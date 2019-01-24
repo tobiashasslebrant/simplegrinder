@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using SimpleGrind.Parameters;
 
 namespace SimpleGrind.Loadtest
 {
@@ -15,30 +16,51 @@ namespace SimpleGrind.Loadtest
 		{
 			_action = action;
 		}
-		public LoadResult Run(int numberOfCalls, int wait, string logLevel)
+
+		public LoadResult Run(int numberOfCalls, int wait, LogLevel logLevel)
 		{
 			var result = new LoadResult();
 			var errors = new List<string>();
 			var res = Parallel.For(0, numberOfCalls, index =>
 			{
-				var t = _action();
-				
-				lock (_syncLock)
+				try
 				{
-					if (((int) t.StatusCode) < 400)
-						result.Ok++;
-					else
+					var t = _action();
+
+					lock (_syncLock)
 					{
-						result.Failed++;
-						if(logLevel == "VERBOSE")
-							errors.Add(t.Content.ReadAsStringAsync().Result);
+						if (((int) t.StatusCode) < 400)
+							result.Ok++;
+						else
+						{
+							result.Failed++;
+							if (logLevel == LogLevel.Verbose)
+								errors.Add(t.Content.ReadAsStringAsync().Result);
+						}
 					}
+
+					if (wait > 0)
+						Thread.Sleep(wait);
+
 				}
-				if(wait > 0)
-					Thread.Sleep(wait);
+				catch (AggregateException ex)
+				{
+					if (ex.InnerException is TaskCanceledException)
+						result.TimedOut++;
+					else
+						throw;
+				}
+				catch (Exception e)
+				{
+					result.Failed++;
+					if (logLevel == LogLevel.Verbose)
+						errors.Add(e.ToString());
+				}
 			});
 
-			while (!res.IsCompleted) {  }
+			while (!res.IsCompleted)
+			{
+			}
 
 			result.Errors = errors;
 			return result;

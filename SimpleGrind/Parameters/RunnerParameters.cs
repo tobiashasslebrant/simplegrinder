@@ -11,7 +11,7 @@ namespace SimpleGrind.Parameters
         int Wait { get; }
         int ConnectionLimit { get; }
         string WaitUntil { get; }
-        string LogLevel { get; set; }
+        LogLevel LogLevel { get; set; }
         int LogItems { get; set; }
     }
     public class RunnerParameters : IRunnerParameters
@@ -21,11 +21,11 @@ namespace SimpleGrind.Parameters
             parameterBuilder.MapByArg<string>("b", val => Behavior = val);
             parameterBuilder.MapByArg<int>("nr", val => NumberOfRuns = val);
             parameterBuilder.MapByArg<int>("nc", val => NumberOfCalls = val);
-            parameterBuilder.MapByArg<int>("i", val => IncreaseBy = val == 0 ? 1 : val);
+            parameterBuilder.MapByArg<int>("ic", val => IncreaseBy = val);
             parameterBuilder.MapByArg<int>("w", val => Wait = val);
             parameterBuilder.MapByArg<int>("cl", val => ConnectionLimit = val);
             parameterBuilder.MapByArg<string>("wu", val => WaitUntil = val);
-            parameterBuilder.MapByArg<string>("ll", val => LogLevel = val);
+            parameterBuilder.MapByArg<string>("ll", val => LogLevel = Enum.Parse<LogLevel>(val,true));
             parameterBuilder.MapByArg<int>("li", val => LogItems = val);
         }
         public string Behavior { get; private set; } = "async";
@@ -35,7 +35,14 @@ namespace SimpleGrind.Parameters
         public int Wait { get; private set; } = 0;
         public int ConnectionLimit { get; private set; } = 1000;
         public string WaitUntil { get; private set; } = null;
-        public string LogLevel { get; set; } = "NONE";
+        public LogLevel LogLevel { get; set; } = LogLevel.Friendly;
         public int LogItems { get; set; } = 3;
+    }
+
+    public enum LogLevel
+    {
+        Friendly,
+        Verbose,
+        Report
     }
 }

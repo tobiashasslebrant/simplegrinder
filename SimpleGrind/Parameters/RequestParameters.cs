@@ -30,6 +30,6 @@ namespace SimpleGrind.Parameters
         public Dictionary<string, string> Headers { get; private set; } = new Dictionary<string, string>();
         public Dictionary<string, string> Cookies { get; private set; } = new Dictionary<string, string>();
         public string Json { get; private set; } = "";
-        public int TimeOut { get; private set; } = 5;
+        public int TimeOut { get; private set; } = 30;
     }
 }
