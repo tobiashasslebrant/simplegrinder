@@ -13,8 +13,11 @@ namespace SimpleGrind.Runner
         static void Help(RequestParameters reqParams, RunnerParameters runParams)
         {
             Console.Write(
-            "Measure webrequests in sync, async or parallel\r\n\r\n" +
-            "SIMPLEGRIND method url [Parameters]\r\n" +
+            "description: Measure webrequests in sync, async or parallel\r\n" +
+            "\r\n" +
+            "usage: method url [Parameters...]\r\n" +
+            "\r\n" +
+            "parameters:\r\n" +
            $"  method               Method for request. [get|post|put|delete]\r\n" +
            $"  url                  Url used for request\r\n" +
             "  -h headers           Headers included in request.\r\n" +
@@ -34,7 +37,7 @@ namespace SimpleGrind.Runner
            $"                        FRIENDLY is reporting user friendly messages when running" +
            $"                        VERBOSE is reporting user friendly messages with detailed errors when running" +
            $"                        RESULT is only reporting the result grid. Useful when integrating with other tools" +
-           $"  -li logItems         Number of log items to show. Default is {runParams.LogItems}\r\n" +
+           $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
             "  -?                   Show this help\r\n");
         }
         public static void Main(string[] args)
