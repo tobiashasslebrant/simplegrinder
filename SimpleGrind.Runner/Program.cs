@@ -26,17 +26,17 @@ namespace SimpleGrind.Runner
             "                         Format \"cookie1=value1;cookie2=value2\"\r\n" +
             "  -j json              Json used by action put and post\r\n" +
            $"  -b behavior          Request behavior [sync|async|parallel]. Default is {runParams.Behavior}\r\n" +
-           $"  -w wait              Wait between requests in milliseconds. Default is {runParams.Wait}\r\n" +
+           $"  -w wait              Wait between requests in milliseconds. Default is {runParams.Wait}\r\ns" +
            $"  -t timeout           Timeout for each request in seconds. Default is {reqParams.TimeOut}\r\n" +
            $"  -nr numberOfRuns     Number of runs before quitting. Default is {runParams.NumberOfRuns}\r\n" +
            $"  -nc numberOfCalls    Number of calls for first run. Default is {runParams.NumberOfCalls}\r\n" +
            $"  -ic increaseByCalls  Increase number of calls between runs. Default is {runParams.IncreaseBy}\r\n" +
            $"  -cl connectionLimit  Connection limit. Default is {runParams.ConnectionLimit}\r\n" +
            $"  -wu dateTime         Wait to start until datetime (yyyyMMdd hhmmss).\r\n" +
-           $"  -ll loglevel         Loglevel can be FRIENDLY, VERBOSE or RESULT. Default is {runParams.LogLevel}\r\n" +
-           $"                        FRIENDLY is reporting user friendly messages when running" +
-           $"                        VERBOSE is reporting user friendly messages with detailed errors when running" +
-           $"                        RESULT is only reporting the result grid. Useful when integrating with other tools" +
+           $"  -ll loglevel         Loglevel can be FRIENDLY, VERBOSE or REPORT. Default is {runParams.LogLevel}\r\n" +
+           $"                        FRIENDLY is reporting user friendly messages when running\r\n" +
+           $"                        VERBOSE is reporting user friendly messages with detailed errors when running\r\n" +
+           $"                        RESULT is only reporting the result grid. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
             "  -?                   Show this help\r\n");
         }

@@ -25,7 +25,7 @@ namespace SimpleGrind.Parameters
             parameterBuilder.MapByArg<int>("w", val => Wait = val);
             parameterBuilder.MapByArg<int>("cl", val => ConnectionLimit = val);
             parameterBuilder.MapByArg<string>("wu", val => WaitUntil = val);
-            parameterBuilder.MapByArg<string>("ll", val => LogLevel = Enum.Parse<LogLevel>(val,true));
+            parameterBuilder.MapByArg<LogLevel>("ll", val => LogLevel = val);
             parameterBuilder.MapByArg<int>("li", val => LogItems = val);
         }
         public string Behavior { get; private set; } = "async";

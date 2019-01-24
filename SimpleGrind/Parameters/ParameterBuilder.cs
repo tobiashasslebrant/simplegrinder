@@ -18,14 +18,22 @@ namespace SimpleGrind.Parameters
             if(index < _args.Length)
                 map((T)Convert.ChangeType(_args[index], typeof(T)));
         }
-        public void MapByArg<T>(string parameter, Action<T> map)
+        public void MapByArg<T>(string parameter, Action<T> map) where T : struct
         {
             for (var index = 0; index < _args.Length; index++)
             {
                 if (_seperator + parameter == _args[index])
                     try
                     {
-                        map((T) Convert.ChangeType(_args[index + 1], typeof(T)));
+                        if (typeof(T).IsEnum)
+                        {
+                            map((T) Enum.Parse<T>(_args[index + 1], true));
+                        }
+                        else
+                        {
+                            map((T) Convert.ChangeType(_args[index + 1], typeof(T)));
+                        }
+                       
                     }
                     catch (IndexOutOfRangeException)
                     {
