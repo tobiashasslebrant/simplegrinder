@@ -72,7 +72,6 @@ namespace SimpleGrind
 			var errors = new List<(int,string)>();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
-			
 				_gridWriter.WriteCell(run.ToString());
 				_gridWriter.WriteCell(numberOfCalls.ToString());
 				stopWatchOne.Start();
@@ -100,19 +99,15 @@ namespace SimpleGrind
 				catch (Exception ex)
 				{
 					errors.Add((run,ex.ToString()));
-					_gridWriter.WriteCells(new[] {"error","","","",""});
+					_gridWriter.WriteLine("error occured");
 				}
 				totalCalls += numberOfCalls;
 				numberOfCalls += _runnerParameters.IncreaseBy;
 				stopWatchOne.Reset();
 			}
 
-			var totalWaittime = totalCalls * _runnerParameters.Wait > 1000
-				? $"{(totalCalls * _runnerParameters.Wait) / 1000D}s"
-				: $"{(totalCalls * _runnerParameters.Wait)}ms";
-			                    
 			_gridWriter.WriteLine($"====== Metrics ======");
-			_gridWriter.WriteLine($" A total of  {totalCalls} calls where made");
+			_gridWriter.WriteLine($" A total of {totalCalls} calls where made");
 			_gridWriter.WriteLine($" Total time is {(stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds");
 			if(_runnerParameters.Wait > 0)
 				_gridWriter.WriteLine($" Of total time waiting is {(totalCalls * _runnerParameters.Wait) / 1000} seconds {(totalCalls * _runnerParameters.Wait) % 1000D} milliseconds");
