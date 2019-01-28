@@ -18,7 +18,7 @@ namespace SimpleGrind.Parameters
             if(index < _args.Length)
                 map((T)Convert.ChangeType(_args[index], typeof(T)));
         }
-        public void MapByArg<T>(string parameter, Action<T> map) where T : struct
+        public void MapByArg<T>(string parameter, Action<T> map) 
         {
             for (var index = 0; index < _args.Length; index++)
             {
@@ -27,7 +27,7 @@ namespace SimpleGrind.Parameters
                     {
                         if (typeof(T).IsEnum)
                         {
-                            map((T) Enum.Parse<T>(_args[index + 1], true));
+                            map((T)Enum.Parse(typeof(T),_args[index + 1], true));
                         }
                         else
                         {
