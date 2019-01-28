@@ -13,7 +13,7 @@ namespace SimpleGrind.Runner
         static void Help(RequestParameters reqParams, RunnerParameters runParams)
         {
             Console.Write(
-            "description: Measure webrequests in sync, async or parallel\r\n" +
+            "\r\ndescription: Measure webrequests in sync, async or parallel\r\n" +
             "\r\n" +
             "usage: method url [Parameters...]\r\n" +
             "\r\n" +
@@ -26,7 +26,7 @@ namespace SimpleGrind.Runner
             "                         Format \"cookie1=value1;cookie2=value2\"\r\n" +
             "  -j json              Json used by action put and post\r\n" +
            $"  -b behavior          Request behavior [sync|async|parallel]. Default is {runParams.Behavior}\r\n" +
-           $"  -w wait              Wait between requests in milliseconds. Default is {runParams.Wait}\r\ns" +
+           $"  -w wait              Wait between requests in milliseconds. Default is {runParams.Wait}s\r\n" +
            $"  -t timeout           Timeout for each request in seconds. Default is {reqParams.TimeOut}\r\n" +
            $"  -nr numberOfRuns     Number of runs before quitting. Default is {runParams.NumberOfRuns}\r\n" +
            $"  -nc numberOfCalls    Number of calls for first run. Default is {runParams.NumberOfCalls}\r\n" +
