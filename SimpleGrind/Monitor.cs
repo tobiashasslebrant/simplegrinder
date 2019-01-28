@@ -61,11 +61,11 @@ namespace SimpleGrind
             var stopWatchOne = new Stopwatch();
             var stopWatchAll = new Stopwatch();
  
-			WriteLine("====== Parameters ======", Context.Parameters);
+			WriteLine("\r\n====== Parameters ======", Context.Parameters);
 			WriteLine($" Executing {_runnerParameters.NumberOfRuns} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}", Context.Parameters);
             WriteLine($" First run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between each run", Context.Parameters);
 			WriteLine($" Each call will have a timeout of {_requestParameters.TimeOut}s and will wait {_runnerParameters.Wait}ms between each call", Context.Parameters);
-			WriteLine("====== Result ======", Context.Result);
+			WriteLine("\r\n====== Result ======", Context.Result);
             WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
 
 			stopWatchAll.Start();
@@ -106,7 +106,7 @@ namespace SimpleGrind
 				stopWatchOne.Reset();
 			}
 
-			WriteLine($"====== Summary ======", Context.Summary);
+			WriteLine($"\r\n====== Summary ======", Context.Summary);
 			WriteLine($" A total of {totalCalls} calls where made", Context.Summary);
 			WriteLine($" Total time is {(stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds", Context.Summary);
 			if(_runnerParameters.Wait > 0)
@@ -115,20 +115,20 @@ namespace SimpleGrind
 			
 			if (errors.Any())
 			{
-				WriteLine($"====== Errors ====== ", Context.Summary);
 				WriteLine($" Total of {errors.Count()} errors", Context.Summary);
 
+				WriteLine($"\r\n====== Errors ====== ", Context.Errors);
 				if (errors.Count > _runnerParameters.LogItems)
 					WriteLine($" Showing first {_runnerParameters.LogItems} errors", Context.Errors);
 
 				foreach (var (run, error) in errors.Take(_runnerParameters.LogItems))
 				{
-					WriteLine($">>>  Error in run {run} <<<", Context.Errors);
+					WriteLine($"\r\n>>>  Error in run {run} <<<", Context.Errors);
 					WriteLine($"{error}", Context.Errors);
 				}
 
 				if (errors.Count > _runnerParameters.LogItems)
-					WriteLine($"... more errors ...", Context.Errors);
+					WriteLine($"\r\n... more errors ...", Context.Errors);
 			}
         }
 
