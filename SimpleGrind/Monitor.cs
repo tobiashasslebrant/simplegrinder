@@ -36,7 +36,7 @@ namespace SimpleGrind
 
 			if (maxConcurrentCalls > _runnerParameters.ConnectionLimit)
 			{
-				_gridWriter.WriteLine($"Max concurrent calls {maxConcurrentCalls} are larger than connectionlimit {_runnerParameters.ConnectionLimit}.");
+				WriteLine($"Max concurrent calls {maxConcurrentCalls} are larger than connectionlimit {_runnerParameters.ConnectionLimit}.", Context.Parameters);
 				return;
 			}
 
@@ -47,10 +47,10 @@ namespace SimpleGrind
 
 				if (waitTime.TotalMilliseconds > Int32.MaxValue)
 				{
-					_gridWriter.WriteLine("Waiting until time is to far away, try a smaller date");
+					WriteLine("Waiting until time is to far away, try a smaller date", Context.Parameters);
 					return;
 				}
-				_gridWriter.WriteLine($"Wait for {waitFor.ToString("F")} ({waitTime.Days} days {waitTime.Hours} hours {waitTime.Minutes} minutes {waitTime.Seconds} seconds)");
+				WriteLine($"Wait for {waitFor.ToString("F")} ({waitTime.Days} days {waitTime.Hours} hours {waitTime.Minutes} minutes {waitTime.Seconds} seconds)", Context.Parameters);
 
 				System.Threading.Thread.Sleep(waitTime);
 			}
@@ -61,26 +61,26 @@ namespace SimpleGrind
             var stopWatchOne = new Stopwatch();
             var stopWatchAll = new Stopwatch();
  
-			_gridWriter.WriteLine("====== Parameters ======");
-			_gridWriter.WriteLine($" Executing {_runnerParameters.NumberOfRuns} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}");
-            _gridWriter.WriteLine($" First run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between each run");
-			_gridWriter.WriteLine($" Each call will have a timeout of {_requestParameters.TimeOut}s and will wait {_runnerParameters.Wait}ms between each call");
-			_gridWriter.WriteLine("====== Result ======");
-            _gridWriter.WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
+			WriteLine("====== Parameters ======", Context.Parameters);
+			WriteLine($" Executing {_runnerParameters.NumberOfRuns} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}", Context.Parameters);
+            WriteLine($" First run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between each run", Context.Parameters);
+			WriteLine($" Each call will have a timeout of {_requestParameters.TimeOut}s and will wait {_runnerParameters.Wait}ms between each call", Context.Parameters);
+			WriteLine("====== Result ======", Context.Result);
+            WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
 
 			stopWatchAll.Start();
 			var errors = new List<(int,string)>();
             for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
 			{
-				_gridWriter.WriteCell(run.ToString());
-				_gridWriter.WriteCell(numberOfCalls.ToString());
+				WriteCell(run.ToString());
+				WriteCell(numberOfCalls.ToString());
 				stopWatchOne.Start();
 				try
 				{
 					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait, _runnerParameters.LogLevel);
 					var runTime = stopWatchOne.ElapsedMilliseconds - (numberOfCalls * _runnerParameters.Wait);
 					var avgTime = runTime / numberOfCalls;
-					_gridWriter.WriteCells(new[]
+					WriteCells(new[]
 					{
 						result.Ok.ToString(),
 						result.Failed.ToString(),
@@ -99,40 +99,90 @@ namespace SimpleGrind
 				catch (Exception ex)
 				{
 					errors.Add((run,ex.ToString()));
-					_gridWriter.WriteLine("error occured");
+					WriteLine("error occured", Context.Result);
 				}
 				totalCalls += numberOfCalls;
 				numberOfCalls += _runnerParameters.IncreaseBy;
 				stopWatchOne.Reset();
 			}
 
-			_gridWriter.WriteLine($"====== Metrics ======");
-			_gridWriter.WriteLine($" A total of {totalCalls} calls where made");
-			_gridWriter.WriteLine($" Total time is {(stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds");
+			WriteLine($"====== Summary ======", Context.Summary);
+			WriteLine($" A total of {totalCalls} calls where made", Context.Summary);
+			WriteLine($" Total time is {(stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds", Context.Summary);
 			if(_runnerParameters.Wait > 0)
-				_gridWriter.WriteLine($" Of total time waiting is {(totalCalls * _runnerParameters.Wait) / 1000} seconds {(totalCalls * _runnerParameters.Wait) % 1000D} milliseconds");
-			_gridWriter.WriteLine($" Average time is {((stopWatchAll.ElapsedMilliseconds - (totalCalls * _runnerParameters.Wait))/ totalCalls)} milliseconds");
+				WriteLine($" Of total time waiting is {(totalCalls * _runnerParameters.Wait) / 1000} seconds {(totalCalls * _runnerParameters.Wait) % 1000D} milliseconds", Context.Summary);
+			WriteLine($" Average time is {((stopWatchAll.ElapsedMilliseconds - (totalCalls * _runnerParameters.Wait))/ totalCalls)} milliseconds", Context.Summary);
 			
 			if (errors.Any())
 			{
-				_gridWriter.WriteLine($"====== Errors ====== ");
-				_gridWriter.WriteLine($" Total of {errors.Count()} errors");
+				WriteLine($"====== Errors ====== ", Context.Summary);
+				WriteLine($" Total of {errors.Count()} errors", Context.Summary);
 
-				if (_runnerParameters.LogLevel == LogLevel.Verbose)
+				if (errors.Count > _runnerParameters.LogItems)
+					WriteLine($" Showing first {_runnerParameters.LogItems} errors", Context.Errors);
+
+				foreach (var (run, error) in errors.Take(_runnerParameters.LogItems))
 				{
-					if (errors.Count > _runnerParameters.LogItems)
-						_gridWriter.WriteLine($" Showing first {_runnerParameters.LogItems} errors");
-
-					foreach (var (run, error) in errors.Take(_runnerParameters.LogItems))
-					{
-						_gridWriter.WriteLine($">>>  Error in run {run} <<<");
-						_gridWriter.WriteLine($"{error}");
-					}
-
-					if (errors.Count > _runnerParameters.LogItems)
-						_gridWriter.WriteLine($"... more errors ...");
+					WriteLine($">>>  Error in run {run} <<<", Context.Errors);
+					WriteLine($"{error}", Context.Errors);
 				}
+
+				if (errors.Count > _runnerParameters.LogItems)
+					WriteLine($"... more errors ...", Context.Errors);
 			}
         }
+
+	    void WriteLine(string line, Context context)
+	    {
+		    switch (_runnerParameters.LogLevel)
+		    {
+			    case LogLevel.Friendly:
+				    if(context != Context.Errors)
+						_gridWriter.WriteLine(line);
+				    break;
+			    case LogLevel.Verbose:
+				    _gridWriter.WriteLine(line);
+				    break;
+			    case LogLevel.Report:
+				    if(context == Context.Result)
+					    _gridWriter.WriteLine(line);
+				    break;
+			    case LogLevel.Summary:
+				    if(context == Context.Summary)
+					    _gridWriter.WriteLine(line);
+				    break;
+			    default:
+				    throw new ArgumentOutOfRangeException();
+		    }
+	    }
+	    
+	    void WriteHeaders(string[] headers)
+	    {
+		    if(_runnerParameters.LogLevel == LogLevel.Summary)
+			    return;
+		    _gridWriter.WriteHeaders(headers);
+	    }
+	    void WriteCells(string[] cells)
+	    {
+		    if(_runnerParameters.LogLevel == LogLevel.Summary)
+			    return;
+		    _gridWriter.WriteCells(cells);
+	    }
+
+	    void WriteCell(string cell)
+	    {
+		    if(_runnerParameters.LogLevel == LogLevel.Summary)
+			    return;
+		    _gridWriter.WriteCell(cell);
+	    }
+
+	    enum Context
+	    {
+		    Parameters,
+		    Result,
+		    Summary,
+		    Errors
+	    }
+	    
     }
 }

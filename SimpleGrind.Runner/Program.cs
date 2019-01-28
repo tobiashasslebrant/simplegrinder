@@ -33,10 +33,11 @@ namespace SimpleGrind.Runner
            $"  -ic increaseByCalls  Increase number of calls between runs. Default is {runParams.IncreaseBy}\r\n" +
            $"  -cl connectionLimit  Connection limit. Default is {runParams.ConnectionLimit}\r\n" +
            $"  -wu dateTime         Wait to start until datetime (yyyyMMdd hhmmss).\r\n" +
-           $"  -ll loglevel         Loglevel can be FRIENDLY, VERBOSE or REPORT. Default is {runParams.LogLevel}\r\n" +
-           $"                        FRIENDLY is reporting user friendly messages when running\r\n" +
-           $"                        VERBOSE is reporting user friendly messages with detailed errors when running\r\n" +
+           $"  -ll loglevel         Loglevel can be FRIENDLY, VERBOSE, REPORT or SUMMARY. Default is {runParams.LogLevel}\r\n" +
+           $"                        FRIENDLY is reporting friendly messages with a result grid and summary\r\n" +
+           $"                        VERBOSE is FRIENDLY but with detailed errors\r\n" +
            $"                        RESULT is only reporting the result grid. Useful when integrating with other tools\r\n" +
+           $"                        SUMMARY is only reporting the summary. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
             "  -?                   Show this help\r\n");
         }
@@ -54,7 +55,7 @@ namespace SimpleGrind.Runner
         
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<ParameterBuilder>();
-            serviceCollection.AddTransient<IGridWriter>(s => new GridConsole(Console.Out, 16,7,runnerParams.LogLevel));
+            serviceCollection.AddTransient<IGridWriter>(s => new GridConsole(Console.Out, 16,7));
             serviceCollection.AddTransient<IMonitor, Monitor>();
             serviceCollection.AddTransient<ILoadTestFactory,LoadTestFactory>();
             serviceCollection.AddSingleton<IRequestParameters>(_ => requestParams);

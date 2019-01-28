@@ -14,18 +14,16 @@ namespace SimpleGrind
 
     public class GridConsole : IGridWriter
 	{
-        public GridConsole(TextWriter writer, int columnWidth, int noOfColumns, LogLevel logLevel)
+        public GridConsole(TextWriter writer, int columnWidth, int noOfColumns)
         {
             _writer = writer;
             _columnWidth = columnWidth;
             _noOfColumns = noOfColumns;
-	        _logLevel = logLevel;
         }
 
 		readonly TextWriter _writer;
 		readonly int _columnWidth;
 		readonly int _noOfColumns;
-		private readonly LogLevel _logLevel;
 		int _columnIndex = 0;
 
         public void WriteHeaders(string[] headers)
@@ -52,9 +50,6 @@ namespace SimpleGrind
 
 		public void WriteLine(string line)
 		{
-			if(_logLevel == LogLevel.Report)
-				return;
-			
 			if (_columnIndex > 0)
 			{
 				_columnIndex = 0;

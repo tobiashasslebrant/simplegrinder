@@ -43,6 +43,7 @@ namespace SimpleGrind.Parameters
     {
         Friendly,
         Verbose,
-        Report
+        Report,
+        Summary    
     }
 }
