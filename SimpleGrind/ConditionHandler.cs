@@ -7,22 +7,20 @@ using SimpleGrind.Parameters;
 
 namespace SimpleGrind
 {
-    public class ErrorConditionHandler
+    public class ConditionHandler
     {
         private readonly IRunnerParameters _runnerParameters;
-        private readonly IErrorWriter _errorWriter;
 
-        public ErrorConditionHandler(IRunnerParameters runnerParameters, IErrorWriter errorWriter)
+        public ConditionHandler(IRunnerParameters runnerParameters)
         {
             _runnerParameters = runnerParameters;
-            _errorWriter = errorWriter;
         }
 
         public (bool,string[]) Validate(AggregatedRunResult aggregatedResult)
         {
             var errorCount = aggregatedResult.RunResults.SelectMany(s => s.Errors).Count();
 
-            var cond = Regex.Match(_runnerParameters.ErrorCondition,"^(.+)([<>!=#])(.+)$");
+            var cond = Regex.Match(_runnerParameters.ErrorCondition,"^(.+)([<>!=%#])(.+)$");
             var field = cond.Groups[1].Value;
             var condition = cond.Groups[2].Value;
             var val = cond.Groups[3].Value;
@@ -87,10 +85,10 @@ namespace SimpleGrind
                         return (int) Convert.ChangeType(fieldValue, typeof(int)) <
                                (int) Convert.ChangeType(val, typeof(int));
                     case "%":
-                        return ((int) Convert.ChangeType(fieldValue, typeof(int)) * 100) / percentageCompare >
+                        return (int) Convert.ChangeType(fieldValue, typeof(int)) * 100 / percentageCompare >
                                (int) Convert.ChangeType(val, typeof(int));
                     case "#":
-                        return ((int) Convert.ChangeType(fieldValue, typeof(int)) * 100) / percentageCompare <
+                        return (int) Convert.ChangeType(fieldValue, typeof(int)) * 100 / percentageCompare <
                                (int) Convert.ChangeType(val, typeof(int));
                     default: return false;
                 }

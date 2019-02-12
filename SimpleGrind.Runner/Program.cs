@@ -69,9 +69,8 @@ namespace SimpleGrind.Runner
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<ParameterBuilder>();
             serviceCollection.AddTransient<LoadRunner>();
-            serviceCollection.AddTransient<ErrorConditionHandler>();
+            serviceCollection.AddTransient<ConditionHandler>();
             serviceCollection.AddTransient<IGridWriter>(s => new GridConsole(Console.Out, 16,7));
-            serviceCollection.AddTransient<IErrorWriter>(s => new ErrorWriter(Console.Error));
             serviceCollection.AddTransient<IMonitor, Monitor>();
             serviceCollection.AddTransient<ILoadTestFactory,LoadTestFactory>();
             serviceCollection.AddSingleton<IRequestParameters>(_ => requestParams);

@@ -22,19 +22,19 @@ namespace SimpleGrind
 	    readonly IRequestParameters _requestParameters;
 	    readonly IRunnerParameters _runnerParameters;
 	    private readonly LoadRunner _runner;
-	    private readonly ErrorConditionHandler _errorConditionHandler;
+	    private readonly ConditionHandler _conditionHandler;
 
 	    public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, 
 		    IRequestParameters requestParameters, IRunnerParameters runnerParameters, 
 		    LoadRunner runner,
-		    ErrorConditionHandler errorConditionHandler)
+		    ConditionHandler conditionHandler)
         {
             _gridWriter = gridWriter;
             _loadTestFactory = loadTestFactory;
             _requestParameters = requestParameters;
             _runnerParameters = runnerParameters;
 	        _runner = runner;
-	        _errorConditionHandler = errorConditionHandler;
+	        _conditionHandler = conditionHandler;
         }
 
 	    public int Start()
@@ -129,7 +129,7 @@ namespace SimpleGrind
 
 		    if (_runnerParameters.ErrorCondition != string.Empty)
 		    {
-			    var (conditionRaised, conditions) = _errorConditionHandler.Validate(aggregatedResult);
+			    var (conditionRaised, conditions) = _conditionHandler.Validate(aggregatedResult);
 			    if (conditionRaised)
 			    {
 				    WriteLine($"\r\n====== Conditions ====== ", Context.Conditions);
