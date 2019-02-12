@@ -32,52 +32,52 @@ namespace SimpleGrind
                 var comparer = cond.Groups[2].Value;
                 var val = long.Parse(cond.Groups[3].Value);
                
-                switch (field)
+                switch (field.ToLower())
                 {
                     case "totaltime":
                         if (HasError(aggregatedResult.TotalTime))
                             errors.Add(
-                                $"condition: {_runnerParameters.ErrorCondition}. Totaltime: {aggregatedResult.TotalTime}");
+                                $"{_runnerParameters.ErrorCondition}. Totaltime: {aggregatedResult.TotalTime}");
                         break;
                     case "totalavg":
                         if (HasError(aggregatedResult.AverageTime))
                             errors.Add(
-                                $"condition: {_runnerParameters.ErrorCondition}. Averagetime: {aggregatedResult.AverageTime}");
+                                $"{_runnerParameters.ErrorCondition}. Averagetime: {aggregatedResult.AverageTime}");
                         break;
                     case "totalerrors":
                         if (HasError(errorCount, aggregatedResult.TotalCalls))
                             errors.Add(
-                                $"condition: {_runnerParameters.ErrorCondition}. Totalerrors: {errorCount}, Totalcalls: {aggregatedResult.TotalCalls}");
+                                $"{_runnerParameters.ErrorCondition}. Totalerrors: {errorCount}, Totalcalls: {aggregatedResult.TotalCalls}");
                         break;
                     case "ok":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.Ok, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"condition: {_runnerParameters.ErrorCondition}. Ok: {runResult.Ok}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ErrorCondition}. Ok: {runResult.Ok}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "failed":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.Failed, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"condition: {_runnerParameters.ErrorCondition}. Failed: {runResult.Failed}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ErrorCondition}. Failed: {runResult.Failed}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "timedout":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.TimedOut, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"condition: {_runnerParameters.ErrorCondition}. Timedout: {runResult.TimedOut}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ErrorCondition}. Timedout: {runResult.TimedOut}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "time":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.TotalTime, aggregatedResult.TotalTime))
                                 errors.Add(
-                                    $"condition: {_runnerParameters.ErrorCondition}. Time: {runResult.TotalTime}, TotTime: {aggregatedResult.TotalTime}");
+                                    $"{_runnerParameters.ErrorCondition}. Time: {runResult.TotalTime}, TotTime: {aggregatedResult.TotalTime}");
                         break;
                     case "avg":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.AverageTime, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"condition: {_runnerParameters.ErrorCondition}. AverageTime: {runResult.AverageTime}, TotAverageTime: {aggregatedResult.AverageTime}");
+                                    $"{_runnerParameters.ErrorCondition}. AverageTime: {runResult.AverageTime}, TotAverageTime: {aggregatedResult.AverageTime}");
                         break;
                 }
 
