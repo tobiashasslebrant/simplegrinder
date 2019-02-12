@@ -39,8 +39,11 @@ namespace SimpleGrind.Runner
            $"                        RESULT is only reporting the result grid. Useful when integrating with other tools\r\n" +
            $"                        SUMMARY is only reporting the summary. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
-           $"  -ec condition        Error condition\r\n" +
-           $"                        Syntax per run: [totaltime|totalavg|time|avg|ok|failed|timedout][%|#|=|<|>|!][value|percentage]\r\n" +
+           $"  -ec condition        Exit condition. Will exit 1 when fullfilled\r\n" +
+           $"                        Syntax per run: [ok|failed|timedout|time|avg|totaltime|totalavg][%|#|=|<|>|!][value|percentage]\r\n" +
+           $"                         When a % is used, comparing is doing by percentageagainst relevant field. " +
+           $"                          Percentage must be greater than value. (# is the same as % but will compare with" +
+           $"                          lower than value instead." +
            $"                         Example: failed%80 => failed > 80 percent\r\n" +
            $"                         Example: ok#80 => ok < 80 percent\r\n" +
            $"                         Example: totaltime>1000\r\n" +
