@@ -44,6 +44,7 @@ namespace SimpleGrind.Runner
            $"                         When a % is used, comparing is doing by percentageagainst relevant field. " +
            $"                          Percentage must be greater than value. (# is the same as % but will compare with" +
            $"                          lower than value instead." +
+           $"                         All time comparisions will be with milliseconds" +
            $"                         Example: failed%80 => failed > 80 percent\r\n" +
            $"                         Example: ok#80 => ok < 80 percent\r\n" +
            $"                         Example: totaltime>1000\r\n" +
