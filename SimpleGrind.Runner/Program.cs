@@ -41,13 +41,13 @@ namespace SimpleGrind.Runner
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
            $"  -ec condition        Exit condition. Will exit 1 when fullfilled\r\n" +
            $"                        Syntax per run: [ok|failed|timedout|time|avg|totaltime|totalavg][%|#|=|<|>|!][value|percentage];[...]\r\n" +
-           $"                         Fields ok, failed, timedout, time and avg will test against each run" +
-           $"                         Fields totaltime and totalavg will compare the aggregated result for all runs" +
-           $"                         A semicolon (;) will seperate multiple conditions. Each condition will be applies with OR." +
-           $"                         When a % is used, comparing is doing by percentage against relevant field. " +
-           $"                          Percentage must be greater than value. (# is the same as % but will compare with" +
-           $"                          lower than value instead." +
-           $"                         All time comparisions will be with milliseconds" +
+           $"                         Fields ok, failed, timedout, time and avg will test against each run\r\n" +
+           $"                         Fields totaltime and totalavg will compare the aggregated result for all runs\r\n" +
+           $"                         A semicolon (;) will seperate multiple conditions. Each condition will be applies with OR\r\n" +
+           $"                         When a % is used, comparing is doing by percentage against relevant field\r\n" +
+           $"                          Percentage must be greater than value. (# is the same as % but will compare with\r\n" +
+           $"                          lower than value instead\r\n" +
+           $"                         All time comparisions will be with milliseconds\r\n" +
            $"                         Example: failed%80 => any run, with failed compared to number of calls > 80 percent\r\n" +
            $"                         Example: ok#80 => any run, with ok compared to number of calls < 80 percent\r\n" +
            $"                         Example: totaltime>1000 => total time larger than 1000ms\r\n" +

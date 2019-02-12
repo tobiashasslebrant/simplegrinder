@@ -17,7 +17,7 @@ namespace SimpleGrind
         public (bool, string[]) Validate(AggregatedRunResult aggregatedResult)
         {
             var errorCount = aggregatedResult.RunResults.SelectMany(s => s.Errors).Count();
-            var conditions = _runnerParameters.ErrorCondition.Split(';');
+            var conditions = _runnerParameters.ExitCondition.Split(';');
             var errors = new List<string>();
 
             foreach (var condition in conditions)
@@ -34,63 +34,64 @@ namespace SimpleGrind
                
                 switch (field.ToLower())
                 {
-                    case "totaltime":
-                        if (HasError(aggregatedResult.TotalTime))
-                            errors.Add(
-                                $"{_runnerParameters.ErrorCondition}. Totaltime: {aggregatedResult.TotalTime}");
-                        break;
-                    case "totalavg":
-                        if (HasError(aggregatedResult.AverageTime))
-                            errors.Add(
-                                $"{_runnerParameters.ErrorCondition}. Averagetime: {aggregatedResult.AverageTime}");
-                        break;
-                    case "totalerrors":
-                        if (HasError(errorCount, aggregatedResult.TotalCalls))
-                            errors.Add(
-                                $"{_runnerParameters.ErrorCondition}. Totalerrors: {errorCount}, Totalcalls: {aggregatedResult.TotalCalls}");
-                        break;
                     case "ok":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.Ok, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"{_runnerParameters.ErrorCondition}. Ok: {runResult.Ok}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ExitCondition}. Ok: {runResult.Ok}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "failed":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.Failed, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"{_runnerParameters.ErrorCondition}. Failed: {runResult.Failed}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ExitCondition}. Failed: {runResult.Failed}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "timedout":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.TimedOut, runResult.NumberOfCalls))
                                 errors.Add(
-                                    $"{_runnerParameters.ErrorCondition}. Timedout: {runResult.TimedOut}, NumberOfCalls: {runResult.NumberOfCalls}");
+                                    $"{_runnerParameters.ExitCondition}. Timedout: {runResult.TimedOut}, NumberOfCalls: {runResult.NumberOfCalls}");
                         break;
                     case "time":
                         foreach (var runResult in aggregatedResult.RunResults)
                             if (HasError(runResult.TotalTime, aggregatedResult.TotalTime))
                                 errors.Add(
-                                    $"{_runnerParameters.ErrorCondition}. Time: {runResult.TotalTime}, TotTime: {aggregatedResult.TotalTime}");
+                                    $"{_runnerParameters.ExitCondition}. Time: {runResult.TotalTime}, TotTime: {aggregatedResult.TotalTime}");
                         break;
                     case "avg":
                         foreach (var runResult in aggregatedResult.RunResults)
-                            if (HasError(runResult.AverageTime, runResult.NumberOfCalls))
+                            if (HasError(runResult.AverageTime, aggregatedResult.AverageTime))
                                 errors.Add(
-                                    $"{_runnerParameters.ErrorCondition}. AverageTime: {runResult.AverageTime}, TotAverageTime: {aggregatedResult.AverageTime}");
+                                    $"{_runnerParameters.ExitCondition}. AverageTime: {runResult.AverageTime}, TotAverageTime: {aggregatedResult.AverageTime}");
                         break;
+                    case "totaltime":
+                        if (HasError(aggregatedResult.TotalTime))
+                            errors.Add(
+                                $"{_runnerParameters.ExitCondition}. Totaltime: {aggregatedResult.TotalTime}");
+                        break;
+                    case "totalavg":
+                        if (HasError(aggregatedResult.AverageTime))
+                            errors.Add(
+                                $"{_runnerParameters.ExitCondition}. Averagetime: {aggregatedResult.AverageTime}");
+                        break;
+                    case "totalerrors":
+                        if (HasError(errorCount, aggregatedResult.TotalCalls))
+                            errors.Add(
+                                $"{_runnerParameters.ExitCondition}. Totalerrors: {errorCount}, Totalcalls: {aggregatedResult.TotalCalls}");
+                        break;
+
                 }
 
-                bool HasError(long fieldValue, long percentageCompare = 0)
+                bool HasError(long fieldValue, long percentageCalcValue = 0)
                 {
                     switch (comparer)
                     {
                         case "=": return fieldValue == val;
                         case "!": return fieldValue != val;
                         case ">": return fieldValue > val;
-                        case "<": return fieldValue > val;
-                        case "%": return fieldValue * 100 / percentageCompare > val;
-                        case "#": return fieldValue * 100 / percentageCompare < val;
+                        case "<": return fieldValue < val;
+                        case "%": return fieldValue * 100 / percentageCalcValue > val;
+                        case "#": return fieldValue * 100 / percentageCalcValue < val;
                         default: return false;
                     }
                 }

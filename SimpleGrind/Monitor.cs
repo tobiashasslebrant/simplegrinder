@@ -125,7 +125,7 @@ namespace SimpleGrind
 			 }
 
 
-		    if (_runnerParameters.ErrorCondition != string.Empty)
+		    if (_runnerParameters.ExitCondition != string.Empty)
 		    {
 			    var (conditionRaised, conditions) = _conditionHandler.Validate(aggregatedResult);
 			    if (conditionRaised)
