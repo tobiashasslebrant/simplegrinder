@@ -28,10 +28,6 @@ namespace SimpleGrind
              
             switch (field)
             {
-                case "any":
-                    if(errorCount > 0)
-                        errors.Add($"condition: any. Has {errorCount} errors.");
-                    break;
                 case "totaltime":
                     if(HasError(aggregatedResult.TotalTime, 0))
                         errors.Add($"condition: {_runnerParameters.ErrorCondition}. Totaltime: {aggregatedResult.TotalTime}");
@@ -46,13 +42,13 @@ namespace SimpleGrind
                     break;
                 case "time":
                     foreach (var runResult in aggregatedResult.RunResults)
-                        if(HasError(runResult.TotalTime, runResult.NumberOfCalls))
-                            errors.Add($"condition: {_runnerParameters.ErrorCondition}. TotalTime: {runResult.TotalTime}, NumberOfCalls: {runResult.NumberOfCalls}");
+                        if(HasError(runResult.TotalTime, aggregatedResult.TotalTime))
+                            errors.Add($"condition: {_runnerParameters.ErrorCondition}. Time: {runResult.TotalTime}, TotTime: {aggregatedResult.TotalTime}");
                     break;
                 case "avg":
                     foreach (var runResult in aggregatedResult.RunResults)
                         if(HasError(runResult.AverageTime, runResult.NumberOfCalls))
-                            errors.Add($"condition: {_runnerParameters.ErrorCondition}. AverageTime: {runResult.AverageTime}, NumberOfCalls: {runResult.NumberOfCalls}");
+                            errors.Add($"condition: {_runnerParameters.ErrorCondition}. AverageTime: {runResult.AverageTime}, TotAverageTime: {aggregatedResult.AverageTime}");
                     break;
                 case "ok":
                     foreach (var runResult in aggregatedResult.RunResults)
@@ -72,7 +68,7 @@ namespace SimpleGrind
             }
             return (errors.Any(), errors.ToArray());
 
-            bool HasError<T>(T fieldValue, int percentageCompare)
+            bool HasError<T>(T fieldValue, long percentageCompare)
             {
                 switch (condition)
                 {

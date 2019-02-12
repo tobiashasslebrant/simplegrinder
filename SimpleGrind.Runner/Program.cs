@@ -40,18 +40,11 @@ namespace SimpleGrind.Runner
            $"                        SUMMARY is only reporting the summary. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
            $"  -ec condition        Error condition\r\n" +
-           $"                        Syntax when any error: any\r\n" +
-           $"                         Example: any\r\n" +
-           $"                        Syntax timebased per run: [time|avg][=|<|>|!]<milliseconds>\r\n" +
-           $"                         Example: time>1000\r\n" +
-           $"                        Syntax percent compare per run: [ok|failed|timedout][%#]<percent>\r\n" +
+           $"                        Syntax per run: [totaltime|totalavg|time|avg|ok|failed|timedout][%|#|=|<|>|!][value|percentage]\r\n" +
            $"                         Example: failed%80 => failed > 80 percent\r\n" +
            $"                         Example: ok#80 => ok < 80 percent\r\n" +
-           $"                        Syntax timebased total: [totaltime|totalavg][=|<|>|!]<milliseconds>\r\n" +
            $"                         Example: totaltime>1000\r\n" +
-           $"                        Syntax percent compare total: totalerrors[%#]<percent>\r\n" +
-           $"                         Example: totalerrors%80\r\n" +
-           "  -?                   Show this help\r\n");
+           $"                       Show this help\r\n");
         }
         public static int Main(string[] args)
         {
