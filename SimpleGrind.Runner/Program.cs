@@ -40,14 +40,18 @@ namespace SimpleGrind.Runner
            $"                        SUMMARY is only reporting the summary. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
            $"  -ec condition        Exit condition. Will exit 1 when fullfilled\r\n" +
-           $"                        Syntax per run: [ok|failed|timedout|time|avg|totaltime|totalavg][%|#|=|<|>|!][value|percentage]\r\n" +
-           $"                         When a % is used, comparing is doing by percentageagainst relevant field. " +
+           $"                        Syntax per run: [ok|failed|timedout|time|avg|totaltime|totalavg][%|#|=|<|>|!][value|percentage];[...]\r\n" +
+           $"                         Fields ok, failed, timedout, time and avg will test against each run" +
+           $"                         Fields totaltime and totalavg will compare the aggregated result for all runs" +
+           $"                         A semicolon (;) will seperate multiple conditions. Each condition will be applies with OR." +
+           $"                         When a % is used, comparing is doing by percentage against relevant field. " +
            $"                          Percentage must be greater than value. (# is the same as % but will compare with" +
            $"                          lower than value instead." +
            $"                         All time comparisions will be with milliseconds" +
-           $"                         Example: failed%80 => failed > 80 percent\r\n" +
-           $"                         Example: ok#80 => ok < 80 percent\r\n" +
-           $"                         Example: totaltime>1000\r\n" +
+           $"                         Example: failed%80 => any run, with failed compared to number of calls > 80 percent\r\n" +
+           $"                         Example: ok#80 => any run, with ok compared to number of calls < 80 percent\r\n" +
+           $"                         Example: totaltime>1000 => total time larger than 1000ms\r\n" +
+            $"                        Example: failed!0 => any runs with failed not equal 0\r\n" +
            $"                       Show this help\r\n");
         }
         public static int Main(string[] args)

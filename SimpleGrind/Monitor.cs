@@ -18,19 +18,17 @@ namespace SimpleGrind
     public class Monitor : IMonitor
     {
 	    readonly IGridWriter _gridWriter;
-	    readonly ILoadTestFactory _loadTestFactory;
 	    readonly IRequestParameters _requestParameters;
 	    readonly IRunnerParameters _runnerParameters;
 	    private readonly LoadRunner _runner;
 	    private readonly ConditionHandler _conditionHandler;
 
-	    public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, 
+	    public Monitor(IGridWriter gridWriter, 
 		    IRequestParameters requestParameters, IRunnerParameters runnerParameters, 
 		    LoadRunner runner,
 		    ConditionHandler conditionHandler)
         {
             _gridWriter = gridWriter;
-            _loadTestFactory = loadTestFactory;
             _requestParameters = requestParameters;
             _runnerParameters = runnerParameters;
 	        _runner = runner;
