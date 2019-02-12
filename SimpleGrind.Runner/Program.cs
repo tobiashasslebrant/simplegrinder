@@ -39,9 +39,21 @@ namespace SimpleGrind.Runner
            $"                        RESULT is only reporting the result grid. Useful when integrating with other tools\r\n" +
            $"                        SUMMARY is only reporting the summary. Useful when integrating with other tools\r\n" +
            $"  -li items            Number of log error items to show. Default is {runParams.LogItems}\r\n" +
-            "  -?                   Show this help\r\n");
+           $"  -ec condition        Error condition\r\n" +
+           $"                        Syntax when any error: any\r\n" +
+           $"                         Example: any\r\n" +
+           $"                        Syntax timebased per run: [time|avg][=|<|>|!]<milliseconds>\r\n" +
+           $"                         Example: time>1000\r\n" +
+           $"                        Syntax percent compare per run: [ok|failed|timedout][%#]<percent>\r\n" +
+           $"                         Example: failed%80 => failed > 80 percent\r\n" +
+           $"                         Example: ok#80 => ok < 80 percent\r\n" +
+           $"                        Syntax timebased total: [totaltime|totalavg][=|<|>|!]<milliseconds>\r\n" +
+           $"                         Example: totaltime>1000\r\n" +
+           $"                        Syntax percent compare total: totalerrors[%#]<percent>\r\n" +
+           $"                         Example: totalerrors%80\r\n" +
+           "  -?                   Show this help\r\n");
         }
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             var parameterBuilder = new ParameterBuilder(args, '-');
             var requestParams = new RequestParameters(parameterBuilder);
@@ -50,13 +62,16 @@ namespace SimpleGrind.Runner
             if (args.Length < 2 || args.Any(a => a == "-?"))
             {
                 Help(requestParams, runnerParams);
-                return;
+                return 0;
             }
-        
+            
+            
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<ParameterBuilder>();
             serviceCollection.AddTransient<LoadRunner>();
+            serviceCollection.AddTransient<ErrorConditionHandler>();
             serviceCollection.AddTransient<IGridWriter>(s => new GridConsole(Console.Out, 16,7));
+            serviceCollection.AddTransient<IErrorWriter>(s => new ErrorWriter(Console.Error));
             serviceCollection.AddTransient<IMonitor, Monitor>();
             serviceCollection.AddTransient<ILoadTestFactory,LoadTestFactory>();
             serviceCollection.AddSingleton<IRequestParameters>(_ => requestParams);
@@ -68,7 +83,7 @@ namespace SimpleGrind.Runner
             ServicePointManager.DefaultConnectionLimit = runnerParams.ConnectionLimit;
             var monitor = serviceProvider.GetService<IMonitor>();
             
-            monitor.Start();
+            return monitor.Start();
         }
     }     
 }

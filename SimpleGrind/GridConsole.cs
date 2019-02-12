@@ -4,7 +4,7 @@ using SimpleGrind.Parameters;
 
 namespace SimpleGrind
 {
-    public interface IGridWriter
+	public interface IGridWriter
     {
         void WriteHeaders(string[] headers);
         void WriteCell(string cell);

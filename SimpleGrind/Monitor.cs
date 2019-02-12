@@ -12,7 +12,7 @@ namespace SimpleGrind
 {
     public interface IMonitor
     {
-        void Start();
+        int Start();
     }
 
     public class Monitor : IMonitor
@@ -22,17 +22,22 @@ namespace SimpleGrind
 	    readonly IRequestParameters _requestParameters;
 	    readonly IRunnerParameters _runnerParameters;
 	    private readonly LoadRunner _runner;
+	    private readonly ErrorConditionHandler _errorConditionHandler;
 
-	    public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, IRequestParameters requestParameters, IRunnerParameters runnerParameters, LoadRunner runner)
+	    public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, 
+		    IRequestParameters requestParameters, IRunnerParameters runnerParameters, 
+		    LoadRunner runner,
+		    ErrorConditionHandler errorConditionHandler)
         {
             _gridWriter = gridWriter;
             _loadTestFactory = loadTestFactory;
             _requestParameters = requestParameters;
             _runnerParameters = runnerParameters;
 	        _runner = runner;
+	        _errorConditionHandler = errorConditionHandler;
         }
 
-	    public void Start()
+	    public int Start()
 	    {
 		    var maxConcurrentCalls = 
 				(_runnerParameters.NumberOfRuns * _runnerParameters.IncreaseBy) 
@@ -42,7 +47,7 @@ namespace SimpleGrind
 			if (maxConcurrentCalls > _runnerParameters.ConnectionLimit)
 			{
 				WriteLine($"Max concurrent calls {maxConcurrentCalls} are larger than connectionlimit {_runnerParameters.ConnectionLimit}.", Context.Parameters);
-				return;
+				return 1;
 			}
 
 			if (_runnerParameters.WaitUntil != null)
@@ -53,7 +58,7 @@ namespace SimpleGrind
 				if (waitTime.TotalMilliseconds > Int32.MaxValue)
 				{
 					WriteLine("Waiting until time is to far away, try a smaller date", Context.Parameters);
-					return;
+					return 1;
 				}
 				WriteLine($"Wait for {waitFor.ToString("F")} ({waitTime.Days} days {waitTime.Hours} hours {waitTime.Minutes} minutes {waitTime.Seconds} seconds)", Context.Parameters);
 
@@ -119,7 +124,23 @@ namespace SimpleGrind
 
 				if (errors.Count() > _runnerParameters.LogItems)
 					WriteLine($"\r\n... more errors ...", Context.Errors);
-			}
+			 }
+
+
+		    if (_runnerParameters.ErrorCondition != string.Empty)
+		    {
+			    var (conditionRaised, conditions) = _errorConditionHandler.Validate(aggregatedResult);
+			    if (conditionRaised)
+			    {
+				    WriteLine($"\r\n====== Conditions ====== ", Context.Conditions);
+				    foreach (var condition in conditions)
+						WriteLine(condition, Context.Conditions);
+
+				    return 1;
+			    }
+		    }
+
+		    return 0;
 	    }
 		
 	    void WriteLine(string line, Context context)
@@ -171,7 +192,8 @@ namespace SimpleGrind
 		    Parameters,
 		    Result,
 		    Summary,
-		    Errors
+		    Errors,
+		    Conditions
 	    }
 	    
     }

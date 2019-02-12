@@ -6,7 +6,6 @@ using SimpleGrind.Parameters;
 
 namespace SimpleGrind
 {
-  
     public class LoadRunner
     {
         readonly ILoadTestFactory _loadTestFactory;
@@ -49,7 +48,6 @@ namespace SimpleGrind
                     runResult.TotalTime = runTime;
                     runResult.AverageTime = avgTime;
                     runResult.Errors.AddRange(result.Errors);
-                   
                 }
                 catch (Exception ex)
                 {

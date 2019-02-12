@@ -13,6 +13,7 @@ namespace SimpleGrind.Parameters
         string WaitUntil { get; }
         LogLevel LogLevel { get; set; }
         int LogItems { get; set; }
+        string ErrorCondition { get; set; }
     }
     public class RunnerParameters : IRunnerParameters
     {
@@ -27,7 +28,9 @@ namespace SimpleGrind.Parameters
             parameterBuilder.MapByArg<string>("wu", val => WaitUntil = val);
             parameterBuilder.MapByArg<LogLevel>("ll", val => LogLevel = val);
             parameterBuilder.MapByArg<int>("li", val => LogItems = val);
+            parameterBuilder.MapByArg<string>("ec",val =>  ErrorCondition = val);
         }
+
         public string Behavior { get; private set; } = "async";
         public int NumberOfRuns { get; private set; } = 10;
         public int NumberOfCalls { get; private set; } = 10;
@@ -37,6 +40,7 @@ namespace SimpleGrind.Parameters
         public string WaitUntil { get; private set; } = null;
         public LogLevel LogLevel { get; set; } = LogLevel.Friendly;
         public int LogItems { get; set; } = 3;
+        public string ErrorCondition { get; set; } = "";
     }
 
     public enum LogLevel
