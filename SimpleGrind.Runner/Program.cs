@@ -1,4 +1,4 @@
-﻿using SimpleGrind.Loadtest;
+﻿using SimpleGrind.LoadTest;
 using SimpleGrind.Parameters;
 using System;
 using System.Linq;
@@ -55,17 +55,19 @@ namespace SimpleGrind.Runner
         
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<ParameterBuilder>();
+            serviceCollection.AddTransient<LoadRunner>();
             serviceCollection.AddTransient<IGridWriter>(s => new GridConsole(Console.Out, 16,7));
             serviceCollection.AddTransient<IMonitor, Monitor>();
             serviceCollection.AddTransient<ILoadTestFactory,LoadTestFactory>();
             serviceCollection.AddSingleton<IRequestParameters>(_ => requestParams);
             serviceCollection.AddSingleton<IRunnerParameters>(_ => runnerParams);
             serviceCollection.AddSingleton<ISimpleWebClient,SimpleWebClient>();
-
+            
             var serviceProvider = serviceCollection.BuildServiceProvider();
            
             ServicePointManager.DefaultConnectionLimit = runnerParams.ConnectionLimit;
             var monitor = serviceProvider.GetService<IMonitor>();
+            
             monitor.Start();
         }
     }     

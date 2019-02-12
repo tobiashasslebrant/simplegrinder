@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using SimpleGrind.Loadtest;
+using System.Net.Sockets;
+using SimpleGrind.LoadTest;
+using SimpleGrind.Model;
 using SimpleGrind.Parameters;
 
 namespace SimpleGrind
@@ -19,17 +21,20 @@ namespace SimpleGrind
 	    readonly ILoadTestFactory _loadTestFactory;
 	    readonly IRequestParameters _requestParameters;
 	    readonly IRunnerParameters _runnerParameters;
+	    private readonly LoadRunner _runner;
 
-        public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, IRequestParameters requestParameters, IRunnerParameters runnerParameters)
+	    public Monitor(IGridWriter gridWriter, ILoadTestFactory loadTestFactory, IRequestParameters requestParameters, IRunnerParameters runnerParameters, LoadRunner runner)
         {
             _gridWriter = gridWriter;
             _loadTestFactory = loadTestFactory;
             _requestParameters = requestParameters;
             _runnerParameters = runnerParameters;
+	        _runner = runner;
         }
-		public void Start()
-		{
-			var maxConcurrentCalls = 
+
+	    public void Start()
+	    {
+		    var maxConcurrentCalls = 
 				(_runnerParameters.NumberOfRuns * _runnerParameters.IncreaseBy) 
 				- _runnerParameters.IncreaseBy 
 				+ _runnerParameters.NumberOfCalls;
@@ -55,70 +60,55 @@ namespace SimpleGrind
 				System.Threading.Thread.Sleep(waitTime);
 			}
 
-		    var loadTest = _loadTestFactory.Create(_runnerParameters.Behavior, _requestParameters.Method, _requestParameters.Url, _requestParameters.Json);
-            var numberOfCalls = _runnerParameters.NumberOfCalls;
-			var totalCalls = 0;
-            var stopWatchOne = new Stopwatch();
-            var stopWatchAll = new Stopwatch();
  
 			WriteLine("\r\n====== Parameters ======", Context.Parameters);
 			WriteLine($" Executing {_runnerParameters.NumberOfRuns} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}", Context.Parameters);
             WriteLine($" First run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between each run", Context.Parameters);
 			WriteLine($" Each call will have a timeout of {_requestParameters.TimeOut}s and will wait {_runnerParameters.Wait}ms between each call", Context.Parameters);
 			WriteLine("\r\n====== Result ======", Context.Result);
-            WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
-
-			stopWatchAll.Start();
-			var errors = new List<(int,string)>();
-            for (var run = 1; run <= _runnerParameters.NumberOfRuns; run++)
-			{
-				WriteCell(run.ToString());
-				WriteCell(numberOfCalls.ToString());
-				stopWatchOne.Start();
-				try
-				{
-					var result = loadTest.Run(numberOfCalls, _runnerParameters.Wait, _runnerParameters.LogLevel);
-					var runTime = stopWatchOne.ElapsedMilliseconds - (numberOfCalls * _runnerParameters.Wait);
-					var avgTime = runTime / numberOfCalls;
-					WriteCells(new[]
-					{
-						result.Ok.ToString(),
-						result.Failed.ToString(),
-						result.TimedOut.ToString(),
-						stopWatchOne.ElapsedMilliseconds < 1000
-							? $"{runTime} ms"
-							: $"{runTime / 1000D:F1} s",
-						avgTime < 1000
-							? $"{avgTime} ms"
-							: $"{avgTime / 1000D:F1} s"
-					});
-					if(result.Errors.Any())
-						foreach (var error in result.Errors)
-							errors.Add((run,error));
-				}
-				catch (Exception ex)
-				{
-					errors.Add((run,ex.ToString()));
-					WriteLine("error occured", Context.Result);
-				}
-				totalCalls += numberOfCalls;
-				numberOfCalls += _runnerParameters.IncreaseBy;
-				stopWatchOne.Reset();
-			}
-
-			WriteLine($"\r\n====== Summary ======", Context.Summary);
-			WriteLine($" A total of {totalCalls} calls where made", Context.Summary);
-			WriteLine($" Total time is {(stopWatchAll.ElapsedMilliseconds / 1000)} seconds {stopWatchAll.ElapsedMilliseconds % 1000} milliseconds", Context.Summary);
-			if(_runnerParameters.Wait > 0)
-				WriteLine($" Of total time waiting is {(totalCalls * _runnerParameters.Wait) / 1000} seconds {(totalCalls * _runnerParameters.Wait) % 1000D} milliseconds", Context.Summary);
-			WriteLine($" Average time is {((stopWatchAll.ElapsedMilliseconds - (totalCalls * _runnerParameters.Wait))/ totalCalls)} milliseconds", Context.Summary);
+         
+		    WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
+			var aggregatedResult = _runner.Execute();
+			foreach (var runResult in aggregatedResult.RunResults)
+		    {
+			    WriteCell(runResult.Run.ToString());
+			    WriteCell(runResult.NumberOfCalls.ToString());
+			    WriteCells(new[]
+			    {
+				    runResult.Ok.ToString(),
+				    runResult.Failed.ToString(),
+				    runResult.TimedOut.ToString(),
+				    runResult.TotalTime < 1000
+					    ? $"{runResult.TotalTime} ms"
+					    : $"{runResult.TotalTime / 1000D:F1} s",
+				    runResult.AverageTime < 1000
+					    ? $"{runResult.AverageTime} ms"
+					    : $"{runResult.AverageTime / 1000D:F1} s"
+			    });
+		    }
+		    
 			
+			WriteLine($"\r\n====== Summary ======", Context.Summary);
+			WriteLine($" A total of {aggregatedResult.TotalCalls} calls where made", Context.Summary);
+		    if (_runnerParameters.Wait > 0)
+		    {
+			    WriteLine($" Total time is {(aggregatedResult.TotalTime / 1000)} seconds {aggregatedResult.TotalTime % 1000} milliseconds (including waiting time)", Context.Summary);
+			    WriteLine($" Total waiting is {(aggregatedResult.TotalWaitingTime) / 1000} seconds {(aggregatedResult.TotalWaitingTime) % 1000D} milliseconds", Context.Summary);
+			    WriteLine($" Average time is {aggregatedResult.AverageTime} milliseconds (excluding waiting time)", Context.Summary);
+		    }
+		    else
+		    {
+			    WriteLine($" Total time is {(aggregatedResult.TotalTime / 1000)} seconds {aggregatedResult.TotalTime % 1000} milliseconds", Context.Summary);
+			    WriteLine($" Average time is {aggregatedResult.AverageTime} milliseconds", Context.Summary);    
+		    }
+			
+		    var errors = aggregatedResult.RunResults.SelectMany(c => c.Errors.Select(s => (c.Run, s))).ToArray();
 			if (errors.Any())
 			{
-				WriteLine($" Total of {errors.Count()} errors", Context.Summary);
+				WriteLine($" Total of {aggregatedResult.RunResults.SelectMany(c => c.Errors).Count()} errors", Context.Summary);
 
 				WriteLine($"\r\n====== Errors ====== ", Context.Errors);
-				if (errors.Count > _runnerParameters.LogItems)
+				if (errors.Count() > _runnerParameters.LogItems)
 					WriteLine($" Showing first {_runnerParameters.LogItems} errors", Context.Errors);
 
 				foreach (var (run, error) in errors.Take(_runnerParameters.LogItems))
@@ -127,11 +117,11 @@ namespace SimpleGrind
 					WriteLine($"{error}", Context.Errors);
 				}
 
-				if (errors.Count > _runnerParameters.LogItems)
+				if (errors.Count() > _runnerParameters.LogItems)
 					WriteLine($"\r\n... more errors ...", Context.Errors);
 			}
-        }
-
+	    }
+		
 	    void WriteLine(string line, Context context)
 	    {
 		    switch (_runnerParameters.LogLevel)

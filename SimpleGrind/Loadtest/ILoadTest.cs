@@ -1,7 +1,7 @@
 using System;
 using SimpleGrind.Parameters;
 
-namespace SimpleGrind.Loadtest
+namespace SimpleGrind.LoadTest
 {
 	public interface ILoadTest
 	{

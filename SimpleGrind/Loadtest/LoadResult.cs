@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleGrind.Loadtest
+namespace SimpleGrind.LoadTest
 {
 	public class LoadResult
 	{

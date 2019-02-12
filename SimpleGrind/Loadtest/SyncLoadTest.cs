@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SimpleGrind.Parameters;
 
-namespace SimpleGrind.Loadtest
+namespace SimpleGrind.LoadTest
 {
     public class SyncLoadTest : ILoadTest
     {
