@@ -19,7 +19,7 @@ namespace SimpleGrind
             _runnerParameters = runnerParameters;
         }
 
-        public AggregatedRunResult Execute()
+        public AggregatedRunResult Execute(Action<RunResult> runExecuted)
         {
             var runResults = new AggregatedRunResult();
             var loadTest = _loadTestFactory.Create(_runnerParameters.Behavior, _requestParameters.Method, _requestParameters.Url, _requestParameters.Json);
@@ -48,6 +48,7 @@ namespace SimpleGrind
                     runResult.TotalTime = runTime;
                     runResult.AverageTime = avgTime;
                     runResult.Errors.AddRange(result.Errors);
+                    runExecuted(runResult);
                 }
                 catch (Exception ex)
                 {

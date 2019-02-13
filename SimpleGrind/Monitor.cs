@@ -71,38 +71,46 @@ namespace SimpleGrind
 			WriteLine("\r\n====== Result ======", Context.Result);
          
 		    WriteHeaders(new[] { "Run", "Calls", "Ok", "Failed","Timed Out", "Total Time", "Average Time" });
-			var aggregatedResult = _runner.Execute();
-			foreach (var runResult in aggregatedResult.RunResults)
-		    {
-			    WriteCell(runResult.Run.ToString());
-			    WriteCell(runResult.NumberOfCalls.ToString());
-			    WriteCells(new[]
-			    {
-				    runResult.Ok.ToString(),
-				    runResult.Failed.ToString(),
-				    runResult.TimedOut.ToString(),
-				    runResult.TotalTime < 1000
-					    ? $"{runResult.TotalTime} ms"
-					    : $"{runResult.TotalTime / 1000D:F1} s",
-				    runResult.AverageTime < 1000
-					    ? $"{runResult.AverageTime} ms"
-					    : $"{runResult.AverageTime / 1000D:F1} s"
-			    });
-		    }
+			var aggregatedResult = _runner.Execute(runResult =>
+			{
+				WriteCell(runResult.Run.ToString());
+				WriteCell(runResult.NumberOfCalls.ToString());
+				WriteCells(new[]
+				{
+					runResult.Ok.ToString(),
+					runResult.Failed.ToString(),
+					runResult.TimedOut.ToString(),
+					runResult.TotalTime < 1000
+						? $"{runResult.TotalTime} ms"
+						: $"{runResult.TotalTime / 1000D:F1} s",
+					_runnerParameters.Behavior.ToLower() == "sync"
+						? runResult.AverageTime < 1000
+							? $"{runResult.AverageTime} ms"
+							: $"{runResult.AverageTime / 1000D:F1} s"
+						: "-"
+				});
+			});
+
+		    var averageTime = _runnerParameters.Behavior.ToLower() == "sync"
+			    ? aggregatedResult.AverageTime
+			    : aggregatedResult.TotalTime / _runnerParameters.NumberOfRuns;
+	
+		    var runOrRequest = _runnerParameters.Behavior.ToLower() == "sync"
+			    ? "request"
+			    : "run";
 		    
-			
 			WriteLine($"\r\n====== Summary ======", Context.Summary);
 			WriteLine($" A total of {aggregatedResult.TotalCalls} calls where made", Context.Summary);
 		    if (_runnerParameters.Wait > 0)
 		    {
 			    WriteLine($" Total time is {(aggregatedResult.TotalTime / 1000)} seconds {aggregatedResult.TotalTime % 1000} milliseconds (including waiting time)", Context.Summary);
 			    WriteLine($" Total waiting is {(aggregatedResult.TotalWaitingTime) / 1000} seconds {(aggregatedResult.TotalWaitingTime) % 1000D} milliseconds", Context.Summary);
-			    WriteLine($" Average time is {aggregatedResult.AverageTime} milliseconds (excluding waiting time)", Context.Summary);
+			    WriteLine($" Average time per {runOrRequest} is {averageTime} milliseconds (including waiting time)", Context.Summary);
 		    }
 		    else
 		    {
 			    WriteLine($" Total time is {(aggregatedResult.TotalTime / 1000)} seconds {aggregatedResult.TotalTime % 1000} milliseconds", Context.Summary);
-			    WriteLine($" Average time is {aggregatedResult.AverageTime} milliseconds", Context.Summary);    
+			    WriteLine($" Average time per {runOrRequest} is {averageTime} milliseconds", Context.Summary);    
 		    }
 			
 		    var errors = aggregatedResult.RunResults.SelectMany(c => c.Errors.Select(s => (c.Run, s))).ToArray();
