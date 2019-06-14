@@ -65,7 +65,7 @@ namespace SimpleGrind
 
  
 			WriteLine("\r\n====== Parameters ======", Context.Parameters);
-			WriteLine($" Executing {_runnerParameters.NumberOfRuns} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}", Context.Parameters);
+			WriteLine($" Executing {_runnerParameters.NumberOfRuns} {_runnerParameters.Behavior} runs against [{_requestParameters.Method.ToUpper()}]{_requestParameters.Url}", Context.Parameters);
             WriteLine($" First run starts with {_runnerParameters.NumberOfCalls} calls and increasing by {_runnerParameters.IncreaseBy} calls between each run", Context.Parameters);
 			WriteLine($" Each call will have a timeout of {_requestParameters.TimeOut}s and will wait {_runnerParameters.Wait}ms between each call", Context.Parameters);
 			WriteLine("\r\n====== Result ======", Context.Result);
