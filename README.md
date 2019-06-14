@@ -4,7 +4,7 @@ Measure webrequests in sync, async or parallel
 
 ## Usage
 ```
-dotnet run method url [Parameters...]  
+dotnet run -p SimpleGrind.Runner/SimpleGrind.Runner.csproj method url [Parameters...]  
 ```
 
 ## Parameters:  
@@ -44,4 +44,31 @@ dotnet run method url [Parameters...]
                          Example: failed!0 => any run, with 'failed' not equal 0  
                          Example: totaltime>1000 => total time larger than 1000ms  
   -?                   Show this help
+  ```
+  
+  # Example output
+  ```
+ ====== Parameters ======
+ Executing 10 runs against [GET]http://localhost:5000/healthcheck
+ First run starts with 10 calls and increasing by 5 calls between each run
+ Each call will have a timeout of 30s and will wait 0ms between each call
+
+====== Result ======
+Run             Calls           Ok              Failed          Timed Out       Total Time      Average Time    
+1               10              10              0               0               69 ms           -               
+2               15              15              0               0               17 ms           -               
+3               20              20              0               0               21 ms           -               
+4               25              25              0               0               14 ms           -               
+5               30              30              0               0               10 ms           -               
+6               35              35              0               0               15 ms           -               
+7               40              40              0               0               11 ms           -               
+8               45              45              0               0               12 ms           -               
+9               50              50              0               0               17 ms           -               
+10              55              55              0               0               14 ms           -               
+
+====== Summary ======
+ A total of 325 calls where made
+ Total time is 0 seconds 207 milliseconds
+ Average time per run is 20 milliseconds
+
   ```
