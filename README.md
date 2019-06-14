@@ -1,9 +1,14 @@
 
-description: Measure webrequests in sync, async or parallel  
+# Description
+Measure webrequests in sync, async or parallel  
 
-usage: method url [Parameters...]  
+## Usage
+```
+dotnet run method url [Parameters...]  
+```
 
-parameters:  
+## Parameters:  
+```
   method               Method for request. [get|post|put|delete]  
   url                  Url used for request  
   -h headers           Headers included in request.  
@@ -38,4 +43,5 @@ parameters:
                          Example: ok#80 => any run, with 'ok' compared to number of calls < 80 percent  
                          Example: failed!0 => any run, with 'failed' not equal 0  
                          Example: totaltime>1000 => total time larger than 1000ms  
-  -?                   Show this help  
+  -?                   Show this help
+  ```
