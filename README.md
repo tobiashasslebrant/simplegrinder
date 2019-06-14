@@ -49,7 +49,7 @@ dotnet run -p SimpleGrind.Runner/SimpleGrind.Runner.csproj method url [Parameter
   # Example output
   ```
  ====== Parameters ======
- Executing 10 runs against [GET]http://localhost:5000/healthcheck
+ Executing 10 async runs against [GET]http://localhost:5000/healthcheck
  First run starts with 10 calls and increasing by 5 calls between each run
  Each call will have a timeout of 30s and will wait 0ms between each call
 
