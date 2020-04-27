@@ -23,3 +23,10 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Pack
+      run: dotnet pack
+    - name: Upload packed
+      uses: actions/upload-artifact@v1
+      with:
+          name: runner
+          path: /home/runner/work/simplegrinder/simplegrinder/SimpleGrind.Runner/bin/Debug/SimpleGrind.Runner.1.0.0.nupkg
