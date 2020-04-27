@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
+    #branches: [ master ]
     branches-ignore:
       - '**' #disable workflow (hack)
   pull_request:
