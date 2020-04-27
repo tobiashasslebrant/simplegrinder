@@ -39,8 +39,8 @@ namespace SimpleGrind.LoadTest
 				errors.Add(ex.ToString());
 			}
 
-			var failed = tasks.Where(s => s.IsCompletedSuccessfully && !s.Result.IsSuccessStatusCode).ToArray();
-			var successFull = tasks.Count(s => s.IsCompletedSuccessfully && s.Result.IsSuccessStatusCode);
+			var failed = tasks.Where(s => s.IsCompleted && !s.Result.IsSuccessStatusCode).ToArray();
+			var successFull = tasks.Count(s => s.IsCompleted && s.Result.IsSuccessStatusCode);
 			var timedOut = tasks.Count(s => s.IsCanceled);
 			if (logLevel == LogLevel.Verbose && failed.Any())
 				errors.AddRange(failed.Select(s => s.Result.Content.ReadAsStringAsync().Result));
