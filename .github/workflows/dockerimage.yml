@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    #branches: [ master ]
-    branches-ignore:
-      - '**' #disable workflow (hack)
+    branches: [ master ] 
+    #branches-ignore:
+     # - '**' #disable workflow (hack)
   pull_request:
     branches: [ master ]
 
@@ -18,19 +18,19 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag simplegrinder:$(date +%s)
-    #- name: Build and push Docker images
-     # uses: docker/build-push-action@v1.1.0
-      #with:
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1.1.0
+      with:
         # Username used to log in to a Docker registry. If not set then no login will occur
-        #username: # optional
+        username: ${{ secrets.dockerhub_usr }}
         # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
-        #password: # optional
+        password: ${{ secrets.dockerhub_pwd }}
         # Server address of Docker registry. If not set then will default to Docker Hub
         #registry: # optional
         # Docker repository to tag the image with
-        #repository: 
+        repository: thasse_repository
         # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
-        #tags: # optional
+        tags: simplegrinder
         # Automatically tags the built image with the git reference as per the readme
         #tag_with_ref: # optional
         # Automatically tags the built image with the git short SHA as per the readme
