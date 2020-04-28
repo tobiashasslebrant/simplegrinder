@@ -30,11 +30,11 @@ jobs:
         # Docker repository to tag the image with
         repository: thasse/thasse_repository
         # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
-        tags: simplegrinder
+        #tags: simplegrinder
         # Automatically tags the built image with the git reference as per the readme
         #tag_with_ref: # optional
         # Automatically tags the built image with the git short SHA as per the readme
-        #tag_with_sha: # optional
+        tag_with_sha: true
         # Path to the build context
         #path: # optional, default is .
         # Path to the Dockerfile (Default is '{path}/Dockerfile')
